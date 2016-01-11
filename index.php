@@ -134,7 +134,8 @@ echo <<<EOF
 			<h2>$subtitle</h2>
 
 EOF;
-?>			<form action="./" method="post">
+?>			<p>Music controls may take up to ten seconds to take effect.</p>
+			<form action="./" method="post">
 				<div class="form-control">
 					<label for="url">YouTube URL</label>
 					<div class="input-group">
