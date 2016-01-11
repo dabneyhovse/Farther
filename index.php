@@ -1,7 +1,7 @@
 <?
 include(__DIR__ . '/../lib/include.php');
 
-$sock = 'unix:///srv/python/nearer/nearer.py';
+$sock = 'unix:///srv/python/nearer/.nearer';
 
 function control($message) {
 	$fp = fsockopen($sock);
