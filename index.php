@@ -65,7 +65,7 @@ if (array_key_exists('url', $_POST)) {
 	if (preg_match('/[\w-]{11}/', $_POST['url'], $matches) and $length = get_length(get_url($matches[0]), true)) {
 		$data = get_data(get_url($matches[0]));
 
-		if (strpos($data['title'], 'Valkyries') === false) {
+		if (strpos($data->title, 'Valkyries') === false) {
 			if (control("APPEND $matches[0] $length")) {
 				$result = $pdo->prepare(<<<EOF
 INSERT INTO `history` (
