@@ -31,6 +31,8 @@ function get_url($v, $embed = false) {
 
 $create = !file_exists('nearer.db');
 $pdo = new PDO('sqlite:nearer.db');
+$error = false;
+$success = false;
 
 if ($create) {
 	$pdo->exec(<<<EOF
@@ -87,6 +89,20 @@ print_head('Nearer');
 		<div id="main">
 			<h1>Nearer</h1>
 <?
+if ($error) {
+	echo <<<EOF
+			<div class="error">$error</div>
+
+EOF;
+}
+
+if ($success) {
+	echo <<<EOF
+			<div class="success">$success</div>
+
+EOF;
+}
+
 $subtitles = array(
 	'Beats Ricketts Music',
 	"Don't Play the Ride",
