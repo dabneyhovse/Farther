@@ -63,8 +63,11 @@ if (array_key_exists('action', $_GET)) {
 
 if (array_key_exists('url', $_POST)) {
 	if (preg_match('/[\w-]{11}/', $_POST['url'], $matches) and $length = get_length(get_url($matches[0]), true)) {
-		if (control("APPEND $matches[0] $length")) {
-			$result = $pdo->prepare(<<<EOF
+		$data = get_data(get_url($matches[0]));
+
+		if (strpos($data['title'], 'Valkyries') === false) {
+			if (control("APPEND $matches[0] $length")) {
+				$result = $pdo->prepare(<<<EOF
 INSERT INTO `history` (
 	`user`,
 	`v`,
@@ -76,16 +79,19 @@ VALUES (
 	DATETIME('now')
 )
 EOF
-				);
+					);
 
-			$result->execute(array(
-				':user' => $_SERVER['PHP_AUTH_USER'],
-				':v' => $matches[0]
-			));
+				$result->execute(array(
+					':user' => $_SERVER['PHP_AUTH_USER'],
+					':v' => $matches[0]
+				));
 
-			$success = 'Successfully added video to queue.';
+				$success = 'Successfully added video to queue.';
+			} else {
+				$error = 'Failed to add video to queue.';
+			}
 		} else {
-			$error = 'Failed to add video to queue.';
+			$error = 'Ride detected. Nice try, punk.';
 		}
 	} else {
 		$error = 'Invalid URL or video ID.';
