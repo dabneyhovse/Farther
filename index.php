@@ -48,7 +48,17 @@ EOF
 }
 
 if (array_key_exists('action', $_GET)) {
-
+	switch ($_GET['action']) {
+		case 'play':
+			control('PLAY');
+			break;
+		case 'skip':
+			control('SKIP');
+			break;
+		case 'stop':
+			control('STOP');
+			break;
+	}
 }
 
 if (array_key_exists('url', $_POST)) {
