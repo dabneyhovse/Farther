@@ -4,6 +4,8 @@ include(__DIR__ . '/../lib/include.php');
 $sock = 'unix:///srv/python/nearer/.nearer';
 
 function control($message) {
+	global $sock;
+
 	$fp = fsockopen($sock);
 
 	if (!$fp) {
