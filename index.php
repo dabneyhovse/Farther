@@ -72,6 +72,7 @@ EOF
 			$success = 'Successfully added video to queue.';
 		} else {
 			$error = 'Failed to add video to queue.';
+		}
 	} else {
 		$error = 'Invalid URL or video ID.';
 	}
