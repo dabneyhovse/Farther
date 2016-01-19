@@ -173,7 +173,7 @@ while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
 	$author_name = htmlentities($data->author_name, NULL, 'UTF-8');
 	$author_url = htmlentities($data->author_url, NULL, 'UTF-8');
 	$thumbnail = htmlentities($data->thumbnail_url, NULL, 'UTF-8');
-	$active = strpos(@file_get_contents($play), $url) ? ' active' : '';
+	$active = strpos(@file_get_contents($play), $row['v']) ? ' active' : '';
 
 	echo <<<EOF
 			<div class="media$active">
