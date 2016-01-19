@@ -2,6 +2,7 @@
 include(__DIR__ . '/../lib/include.php');
 
 $sock = 'unix:///srv/python/nearer/.nearer';
+$play = '/srv/ftp/nearer';
 
 function control($message) {
 	global $sock;
@@ -172,9 +173,10 @@ while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
 	$author_name = htmlentities($data->author_name, NULL, 'UTF-8');
 	$author_url = htmlentities($data->author_url, NULL, 'UTF-8');
 	$thumbnail = htmlentities($data->thumbnail_url, NULL, 'UTF-8');
+	$active = strpos(@file_get_contents($play), $url) ? ' active' : '';
 
 	echo <<<EOF
-			<div class="media">
+			<div class="media$active">
 				<div class="pull-left">
 					<img src="$thumbnail" />
 				</div>
