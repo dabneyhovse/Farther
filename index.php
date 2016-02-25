@@ -4,7 +4,7 @@ include(__DIR__ . '/../lib/include.php');
 $sock = 'unix:///srv/python/nearer/.nearer';
 $play = '/srv/ftp/nearer';
 
-function control($message) {
+function nearer_control($message) {
 	global $sock;
 
 	$fp = fsockopen($sock);
@@ -16,6 +16,29 @@ function control($message) {
 	fwrite($fp, $message . "\n");
 	fclose($fp);
 	return true;
+}
+
+function nearer_record($v) {
+	global $pdo;
+
+	$result = $pdo->prepare(<<<EOF
+INSERT INTO `history` (
+	`user`,
+	`v`,
+	`created`
+)
+VALUES (
+	:user,
+	:v,
+	DATETIME('now')
+)
+EOF
+		);
+
+	$result->execute(array(
+		':user' => $_SERVER['PHP_AUTH_USER'],
+		':v' => $v
+	));
 }
 
 function get_data($url) {
@@ -49,15 +72,14 @@ EOF
 }
 
 if (array_key_exists('action', $_GET)) {
-	switch ($_GET['action']) {
-		case 'play':
-			control('PLAY');
-			break;
-		case 'skip':
-			control('SKIP');
-			break;
-		case 'stop':
-			control('STOP');
+	$action = strtoupper($_GET['action']);
+
+	switch ($action) {
+		case 'PLAY':
+		case 'SKIP':
+		case 'STOP':
+			nearer_control($action);
+			nearer_record($action);
 			break;
 	}
 }
@@ -66,27 +88,9 @@ if (array_key_exists('url', $_POST)) {
 	if (preg_match('/[\w-]{11}/', $_POST['url'], $matches) and $length = get_length(get_url($matches[0]), true)) {
 		$data = get_data(get_url($matches[0]));
 
-		if (strpos($data->title, 'Valkyries') === false) {
-			if (control("APPEND $matches[0] $length")) {
-				$result = $pdo->prepare(<<<EOF
-INSERT INTO `history` (
-	`user`,
-	`v`,
-	`created`
-)
-VALUES (
-	:user,
-	:v,
-	DATETIME('now')
-)
-EOF
-					);
-
-				$result->execute(array(
-					':user' => $_SERVER['PHP_AUTH_USER'],
-					':v' => $matches[0]
-				));
-
+		if (strpos(strtolower($data->title), 'valkyries') === false) {
+			if (nearer_control("APPEND $matches[0] $length")) {
+				nearer_record($matches[0]);
 				$success = 'Successfully added video to queue.';
 			} else {
 				$error = 'Failed to add video to queue.';
@@ -159,6 +163,7 @@ EOF;
 $result = $pdo->prepare(<<<EOF
 SELECT *
 FROM `history`
+WHERE LENGTH(`v`) >= 11
 ORDER BY `created` DESC
 LIMIT 10
 EOF
