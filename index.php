@@ -163,7 +163,7 @@ EOF;
 $result = $pdo->prepare(<<<EOF
 SELECT *
 FROM `history`
-WHERE LENGTH(`v`) >= 11
+WHERE `v` LIKE 'PLAY %'
 ORDER BY `created` DESC
 LIMIT 10
 EOF
@@ -172,7 +172,7 @@ EOF
 $result->execute();
 
 while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-	$url = get_url($row['v']);
+	$url = get_url(substr($row['v'], 5));
 	$data = get_data($url);
 	$title = htmlentities($data->title, NULL, 'UTF-8');
 	$author_name = htmlentities($data->author_name, NULL, 'UTF-8');
