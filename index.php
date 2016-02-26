@@ -76,7 +76,7 @@ if (array_key_exists('action', $_GET)) {
 
 	switch ($action) {
 		case 'SKIP':
-			nearer_record("$action $play");
+			nearer_record($action . ' ' . substr($play, -11));
 		case 'PLAY':
 		case 'STOP':
 			nearer_control($action);
