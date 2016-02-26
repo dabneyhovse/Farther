@@ -2,7 +2,7 @@
 include(__DIR__ . '/../lib/include.php');
 
 $sock = 'unix:///srv/python/nearer/.nearer';
-$play = '/srv/ftp/nearer';
+$play = @file_get_contents('/srv/ftp/nearer');
 
 function nearer_control($message) {
 	global $sock;
@@ -75,11 +75,11 @@ if (array_key_exists('action', $_GET)) {
 	$action = strtoupper($_GET['action']);
 
 	switch ($action) {
-		case 'PLAY':
 		case 'SKIP':
+			nearer_record("$action $play");
+		case 'PLAY':
 		case 'STOP':
 			nearer_control($action);
-			nearer_record($action);
 			break;
 	}
 }
@@ -90,7 +90,7 @@ if (array_key_exists('url', $_POST)) {
 
 		if (strpos(strtolower($data->title), 'valkyries') === false) {
 			if (nearer_control("APPEND $matches[0] $length")) {
-				nearer_record($matches[0]);
+				nearer_record('PLAY ' . $matches[0]);
 				$success = 'Successfully added video to queue.';
 			} else {
 				$error = 'Failed to add video to queue.';
@@ -178,7 +178,7 @@ while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
 	$author_name = htmlentities($data->author_name, NULL, 'UTF-8');
 	$author_url = htmlentities($data->author_url, NULL, 'UTF-8');
 	$thumbnail = htmlentities($data->thumbnail_url, NULL, 'UTF-8');
-	$active = strpos(@file_get_contents($play), $row['v']) ? ' active' : '';
+	$active = strpos($play, $row['v']) ? ' active' : '';
 
 	echo <<<EOF
 			<div class="media$active">
