@@ -165,7 +165,7 @@ SELECT *
 FROM `history`
 WHERE `v` LIKE 'PLAY %'
 ORDER BY `created` DESC
-LIMIT 10
+LIMIT 20
 EOF
 	);
 
