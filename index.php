@@ -18,26 +18,29 @@ function nearer_control($message) {
 	return true;
 }
 
-function nearer_record($v) {
+function nearer_record($v, $note) {
 	global $pdo;
 
 	$result = $pdo->prepare(<<<EOF
 INSERT INTO `history` (
 	`user`,
 	`v`,
-	`created`
+	`created`,
+	`note`
 )
 VALUES (
 	:user,
 	:v,
-	DATETIME('now')
+	DATETIME('now'),
+	:note
 )
 EOF
 		);
 
 	$result->execute(array(
 		':user' => $_SERVER['PHP_AUTH_USER'],
-		':v' => $v
+		':v' => $v,
+		':note' => $note
 	));
 }
 
@@ -65,7 +68,8 @@ if ($create) {
 CREATE TABLE `history` (
 	`user` varchar(64) NOT NULL,
 	`v` varchar(16) NOT NULL,
-	`created` datetime NOT NULL
+	`created` datetime NOT NULL,
+	`note` varchar(255) NULL
 )
 EOF
 		);
@@ -76,7 +80,7 @@ if (array_key_exists('action', $_GET)) {
 
 	switch ($action) {
 		case 'SKIP':
-			nearer_record($action . ' ' . substr($play, -11));
+			nearer_record($action . ' ' . substr($play, -11), NULL);
 		case 'PLAY':
 		case 'STOP':
 			nearer_control($action);
@@ -90,7 +94,7 @@ if (array_key_exists('url', $_POST)) {
 
 		if (strpos(strtolower($data->title), 'valkyries') === false) {
 			if (nearer_control("APPEND $matches[0] $length")) {
-				nearer_record('PLAY ' . $matches[0]);
+				nearer_record('PLAY ' . $matches[0], substr($_POST['note'], 0, 255));
 				$success = 'Successfully added video to queue.';
 			} else {
 				$error = 'Failed to add video to queue.';
@@ -147,6 +151,12 @@ EOF;
 						<input type="text" id="url" name="url" />
 					</div>
 				</div>
+				<div class="form-control optional">
+					<label for="note">Note</label>
+					<div class="input-group">
+						<input type="text" id="note" name="note" maxlength="255" />
+					</div>
+				</div>
 				<div class="form-control">
 					<div class="input-group">
 						<div class="pull-right">
@@ -178,6 +188,7 @@ while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
 	$author_name = htmlentities($data->author_name, NULL, 'UTF-8');
 	$author_url = htmlentities($data->author_url, NULL, 'UTF-8');
 	$thumbnail = htmlentities($data->thumbnail_url, NULL, 'UTF-8');
+	$note = htmlentities($row['note'], NULL, 'UTF-8');
 	$active = strpos($play, substr($row['v'], 5)) ? ' active' : '';
 
 	echo <<<EOF
@@ -190,6 +201,7 @@ while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
 				</h4>
 				<p>Uploaded by <a href="$author_url">$author_name</a></p>
 				<p>Added by $row[user] on $row[created]</p>
+				<p>$note</p>
 			</div>
 
 EOF;
