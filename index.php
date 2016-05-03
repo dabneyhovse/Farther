@@ -80,9 +80,9 @@ if (array_key_exists('action', $_GET)) {
 
 	switch ($action) {
 		case 'SKIP':
-		case 'PLAY':
 		case 'STOP':
 			nearer_record($action . ' ' . substr($play, -11), NULL);
+		case 'PLAY':
 			nearer_control($action);
 			break;
 	}
