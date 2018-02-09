@@ -1,150 +1,171 @@
-<?
+<?php
 include(__DIR__ . '/../lib/include.php');
-
-$sock = 'unix:///srv/python/nearer/.nearer';
-$play = @file_get_contents('/srv/ftp/nearer');
-
-function nearer_control($message) {
-  global $sock;
-
-  $fp = fsockopen($sock);
-
-  if (!$fp) {
-    return false;
-  }
-
-  fwrite($fp, $message . "\n");
-  fclose($fp);
-  return true;
-}
-
-function nearer_record($v, $note) {
-  global $pdo;
-
-  $result = $pdo->prepare(<<<EOF
-INSERT INTO `history` (
-  `user`,
-  `v`,
-  `created`,
-  `note`
-)
-VALUES (
-  :user,
-  :v,
-  DATETIME('now'),
-  :note
-)
-EOF
-    );
-
-  $result->execute(array(
-    ':user' => $_SERVER['PHP_AUTH_USER'],
-    ':v' => $v,
-    ':note' => $note
-  ));
-}
-
-function get_data($url) {
-  return json_decode(file_get_contents("http://www.youtube.com/oembed?url=$url&format=json"));
-}
-
-function get_length($url) {
-  if (preg_match('/([\'"])length_seconds\1:([\'"]?)(\d+)\2/', file_get_contents($url), $matches)) {
-    return $matches[3];
-  }
-}
-
-function get_url($v, $embed = false) {
-  return $embed ? 'http://www.youtube.com/embed/' . $v : 'http://www.youtube.com/watch?v=' . $v;
-}
-
-$create = !file_exists('nearer.db');
-$pdo = new PDO('sqlite:nearer.db');
-$error = false;
-$success = false;
-
-if ($create) {
-  $pdo->exec(<<<EOF
-CREATE TABLE `history` (
-  `user` varchar(64) NOT NULL,
-  `v` varchar(16) NOT NULL,
-  `created` datetime NOT NULL,
-  `note` varchar(255) NULL
-)
-EOF
-    );
-}
-
-if (array_key_exists('action', $_GET)) {
-  $action = strtoupper($_GET['action']);
-
-  switch ($action) {
-    case 'SKIP':
-    case 'STOP':
-      nearer_record($action . ' ' . substr($play, -11), NULL);
-    case 'PLAY':
-      nearer_control($action);
-      break;
-  }
-}
-
-if (array_key_exists('url', $_POST)) {
-  if (preg_match('/[\w-]{11}/', $_POST['url'], $matches) and $length = get_length(get_url($matches[0]), true)) {
-    $data = get_data(get_url($matches[0]));
-
-    if (strpos(strtolower($data->title), 'valkyries') === false) {
-      if (nearer_control("APPEND $matches[0] $length")) {
-        nearer_record('PLAY ' . $matches[0], substr($_POST['note'], 0, 255));
-        $success = 'Successfully added video to queue.';
-      } else {
-        $error = 'Failed to add video to queue.';
-      }
-    } else {
-      $error = 'Ride detected. Nice try, punk.';
-    }
-  } else {
-    $error = 'Invalid URL or video ID.';
-  }
-}
-?><!DOCTYPE html>
+?>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-<?
-print_head('Nearer');
-?>  </head>
+    <?php print_head('Nearer'); ?>
+  </head>
   <body>
     <div id="main">
       <h1>Nearer</h1>
-<?
-if ($error) {
-  echo <<<EOF
-      <div class="error">$error</div>
-
-EOF;
-}
-
-if ($success) {
-  echo <<<EOF
-      <div class="success">$success</div>
-
-EOF;
-}
+<?php
 
 $subtitles = array(
   'Beats Ricketts Music',
   "Don't Play the Ride",
   'Play Loud, Play Proud',
-  'The Day the Music Died'
+  'The Day the Music Died',
+  'Better Than Ever Before!',
+  'New and Improved!'
 );
 
 $subtitle = $subtitles[mt_rand(0, count($subtitles) - 1)];
 
 echo <<<EOF
       <h2>$subtitle</h2>
-
 EOF;
-?>      <p>Music controls may take up to ten seconds to take effect.</p>
-      <form action="./" method="post">
+?>
+      <style>
+        .control {
+          display: inline-block;
+          margin: 0.4em;
+          border: 1px solid #111;
+          border-radius: 0.3em;
+          outline: 0;
+          padding: 0.2em 0.6em;
+          width: auto;
+          background-color: #222;
+          color: #ccc;
+          text-decoration: none;
+          font-size: 0.9em;
+          line-height: 2;
+          cursor: default;
+        }
+        .control:hover {
+          border-color; #222;
+          background-color: #333;
+          color: #ccc;
+        }
+        .control:active {
+          border-color: #222;
+          background-color: #111;
+          color: #999;
+        }
+        .control.disabled {
+          border-color: #444;
+          background-color: #444;
+          color: #999;
+	}
+	.mediasp {
+          margin: 0;
+          padding: 0;
+        }
+        .mediasp > .pull-left {
+	  position: relative;
+	  width: 30%;
+	  top: -2em;
+	  right: 0%;
+	  bottom: 0;
+	  /*! left: 0; */
+	  margin-left: 0;
+	}
+	.mediasp:after {
+          content: "";
+          display: block;
+          clear: both;
+        }	
+      </style>
+
+      <script>
+        function update() {
+        console.log('updating...');
+        fetch('https://blacker.caltech.edu/nearer_ethan_sandbox/process.php?status', {
+          credentials: 'include',
+        }).then(res => res.json()).then(data => {
+          let song_div_inner = '';
+          data.songs.forEach((song) => {
+            let song_element = `<div class="media">
+              <div class="pull-left">
+                <img src="${song.thumbnail}" />
+              </div>
+              <h4>
+                <a href="${song.url}">${song.title}</a>
+              </h4>
+              <p>Uploaded by <a href="${song.author_url}">${song.author_name}</a></p>
+              <p>Added by ${song.added_by} on ${song.added_on}</p>
+              <p>${song.note}</p>
+            </div>`;
+            song_div_inner += song_element;
+          });
+	  document.getElementById('recently_added').innerHTML = song_div_inner;
+
+	  if (data.current) {
+	      document.getElementById('playing_now').innerHTML = `\
+              <div class="pull-left">
+                <img src="${data.current.thumbnail}" />
+              </div>
+              <h4>
+                <a href="${data.current.url}">${data.current.title}</a>
+              </h4>
+	      <p>Uploaded by <a href="${data.current.author_url}">${data.current.author_name}</a></p>`;
+	  } else {
+              document.getElementById('playing_now').innerHTML = `<h3>No Song Playing.</h3>`;
+          }
+        });
+      }
+
+      function get_req(action) {      
+	fetch(`https://blacker.caltech.edu/nearer_ethan_sandbox/process.php?action=${action}`, {
+          credentials: 'include',
+        }).then(update());
+      }
+
+      let lock = false;
+
+      function submit_song() {
+        if (!lock) {
+          lock = true;
+
+          let url = $('#url').val();
+          let note = $('#note').val();
+
+          let formData = new FormData();
+          formData.append('url', url);
+          formData.append('note', note);
+ 
+          fetch('https://blacker.caltech.edu/nearer_ethan_sandbox/process.php', {
+            credentials: 'include',
+            method: 'POST',
+            body: formData,
+          }).then((res) => {
+            lock = false;
+	    update();
+	    if (res.status === 200) {
+              res = res.json();
+
+              $('#url').val('');
+              $('#note').val('');
+
+              $('#success_div').css('display', '');
+              setTimeout(() => { $('#success_div').css('display', 'none') }, 5000);
+            } else {
+              $('#error_code').text(res.status);
+              $('#failure_div').css('display', '');
+              setTimeout(() => { $('#failure_div').css('display', 'none') }, 5000);
+            }
+          });
+        }
+      }
+      </script>
+
+      <div id="success_div" class="success" style="display: none">
+          Success! Song added to queue.
+      </div>
+      <div id="failure_div" class="error" style="display: none">
+          Error! Song not added to queue. Error code: <a id="error_code"></a>
+      </div>
+      <form onsubmit="submit_song(); return false;">
         <div class="form-control">
           <label for="url">YouTube URL</label>
           <div class="input-group">
@@ -159,57 +180,34 @@ EOF;
         </div>
         <div class="form-control">
           <div class="input-group">
+            <button type="submit" class="control">Submit</button>
             <div class="pull-right">
-              <a class="btn" href="?action=play">&nbsp;&#9654;&nbsp;</a>
-              <a class="btn" href="?action=skip">&nbsp;&#9197;&nbsp;</a>
-              <a class="btn" href="?action=stop">&nbsp;&#9724;&nbsp;</a>
+              <button class="control" onclick="get_req('resume')">&nbsp;&#9654;&nbsp;</button>
+              <button class="control" onclick="get_req('skip')">&nbsp;&#9197;&nbsp;</button>
+              <button class="control" onclick="get_req('pause')">&nbsp;&#9724;&nbsp;</button>
             </div>
-            <input type="submit" value="Submit" />
           </div>
-        </div>
-      </form>
-      <h2>Recently Added</h2>
-<?
-$result = $pdo->prepare(<<<EOF
-SELECT *
-FROM `history`
-WHERE `v` LIKE 'PLAY %'
-ORDER BY `created` DESC
-LIMIT 20
-EOF
-  );
-
-$result->execute();
-
-while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-  $url = get_url(substr($row['v'], 5));
-  $data = get_data($url);
-  $title = htmlentities($data->title, NULL, 'UTF-8');
-  $author_name = htmlentities($data->author_name, NULL, 'UTF-8');
-  $author_url = htmlentities($data->author_url, NULL, 'UTF-8');
-  $thumbnail = htmlentities($data->thumbnail_url, NULL, 'UTF-8');
-  $note = htmlentities($row['note'], NULL, 'UTF-8');
-  $active = strpos($play, substr($row['v'], 5)) ? ' active' : '';
-
-  echo <<<EOF
-      <div class="media$active">
-        <div class="pull-left">
-          <img src="$thumbnail" />
-        </div>
-        <h4>
-          <a href="$url">$title</a>
-        </h4>
-        <p>Uploaded by <a href="$author_url">$author_name</a></p>
-        <p>Added by $row[user] on $row[created]</p>
-        <p>$note</p>
+        </form>
+      </div>
+      
+      <h2>Playing Now</h2>
+      <div id="playing_now" class="media mediasp">
+      
       </div>
 
-EOF;
-}
-?>    </div>
-<?
+      <h2>Recently Added</h2>
+      <div id="recently_added">
+
+      </div>
+
+      <script>
+      update();
+      let updateInterval = setInterval(update, 30000);
+      </script>
+
+<?php
 print_footer(
-  'Copyright &copy; 2016 Will Yu',
+  'Copyright &copy; 2018 Ethan Jaszewski',
   'A service of Blacker House'
 );
 ?>  </body>
