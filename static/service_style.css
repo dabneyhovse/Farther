@@ -1,0 +1,45 @@
+html, body {
+    //color: #00300;
+    background: #ffffff url("../static/tiedye_lineargrad.jpg") top center no-repeat ;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+#site-container {
+    max-width: 75em;
+
+    overflow: hidden;
+    word-wrap: break-word;
+}
+
+#page-header {
+    min-height: 170px;
+    padding: 1em;
+}
+#page-header img {
+    max-width: 100%;
+    max-height: 150px;
+}
+
+#page-content {
+    background-color: #ffffff;
+    border-radius: 1em;
+    min-height: 190px;
+    padding: 1.556em 2em 2em;
+    margin-bottom: .5em;
+}
+#page-footer .accessibility {
+    text-align: center;
+}
+#page-footer {
+    background-color: #eee;
+    border-radius: 1em;
+    padding: 0 2em 2em;
+}
+
+html.accessible * {
+    font-family: "Comic Sans MS", Helvetica, sans-serif;
+    background-image: none;
+}
