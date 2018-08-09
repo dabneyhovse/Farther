@@ -15,11 +15,11 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
     <!-- Dabney things -->
-    <link rel="stylesheet" href="css/main.css">
-    <script src="js/accessibility.js"></script>
+    <link rel="stylesheet" href="static/service_style.css">
+    <script src="static/accessibility.js"></script>
 
     <!-- app-specific -->
-    <link rel="stylesheet" href="css/farther.css">
+    <link rel="stylesheet" href="static/farther.css">
 </head>
 <body>
     <div id="site-container" class="container">
@@ -40,14 +40,14 @@
         }).then(res => res.json()).then(data => {
             let song_div_inner = '';
             data.songs.forEach((song) => {
-                let song_element = `<div class="media">
-                    <div class="pull-left">
-                        <img src="${song.thumbnail}" />
+                let song_element = `<div class="row vid-listed">
+                    <img src="${song.thumbnail}" class="col-md-3 col-sm-5 col-xs-12" />
+                    <div class="col-md-9 col-sm-7 col-xs-12">
+                        <h4>
+                            <a href="${song.url}">${song.title}</a>
+                        </h4>
+                        <p>Uploaded by <a href="${song.author_url}">${song.author_name}</a></p>
                     </div>
-                    <h4>
-                        <a href="${song.url}">${song.title}</a>
-                    </h4>
-                    <p>Uploaded by <a href="${song.author_url}">${song.author_name}</a></p>
                 </div>`;
                 song_div_inner += song_element;
             });
@@ -55,13 +55,13 @@
 
             if (data.current) {
     	        document.getElementById('playing_now').innerHTML = `\
-                    <div class="pull-left">
-                        <img src="${data.current.thumbnail}" />
-                    </div>
-                    <h4>
-                        <a href="${data.current.url}">${data.current.title}</a>
-                    </h4>
-    	            <p>Uploaded by <a href="${data.current.author_url}">${data.current.author_name}</a></p>`;
+                    <img src="${data.current.thumbnail}" class="col-md-3 col-sm-5 col-xs-12" />
+                    <div class="col-md-9 col-sm-7 col-xs-12">
+                        <h4>
+                            <a href="${data.current.url}">${data.current.title}</a>
+                        </h4>
+        	            <p>Uploaded by <a href="${data.current.author_url}">${data.current.author_name}</a></p>
+                    </div>`;
     	    } else {
                 document.getElementById('playing_now').innerHTML = `<h3>No Song Playing.</h3>`;
             }
@@ -84,7 +84,9 @@
             let formData = new FormData();
             formData.append('url', url);
             formData.append('note', note);
-            formData.append('user', username);
+            formData.append('user', "testuser");
+            // TODO: store in localStorage or something, we don't want a
+            // formal login system
 
             fetch('process.php', {
                 method: 'POST',
@@ -110,15 +112,15 @@
     </script>
     <div id="page-content">
         <div class="row">
-            <div id="success_div" class="success col-xs-12" style="display: none">
+            <div id="success_div" class="alert alert-success col-xs-12" style="display: none">
                 Success! Song added to queue.
             </div>
-            <div id="failure_div" class="error col-xs-12" style="display: none">
+            <div id="failure_div" class="alert alert-danger col-xs-12" style="display: none">
                 Error! Song not added to queue. Error code: <a id="error_code"></a>
             </div>
         </div>
 
-        <form onsubmit="submit_song(); return false;">
+        <div class="submit-form">
             <div class="row">
                 <label class="col-sm-4 col-xs-12" for="url">YouTube URL</label>
                 <input class="col-sm-8 col-xs-12" type="text" id="url" name="url" />
@@ -128,7 +130,7 @@
                 <input class="col-sm-8 col-xs-12" type="text" id="note" name="note" maxlength="255" />
             </div>
             <div class="row">
-                <button class="btn btn-primary col-sm-offset-4 col-sm-2 col-xs-12" type="submit" class="control">Submit</button>
+                <button class="btn btn-primary col-sm-offset-4 col-sm-2 col-xs-12" onclick="submit_song();" class="control">Submit</button>
 
                 <div class="controls btn-group col-sm-offset-2 col-sm-4 col-xs-12" role="group" aria-label="player controls">
                     <button class="btn btn-success btn-weight" onclick="get_req('resume')">&#9654;</button>
@@ -136,10 +138,10 @@
                     <button class="btn btn-success btn-weight" onclick="get_req('pause')">&#9724;</button>
                 </div>
             </div>
-        </form>
+        </div>
 
         <h2>Playing Now</h2>
-        <div id="playing_now" class="media mediasp">
+        <div id="playing_now" class="row">
 
         </div>
 

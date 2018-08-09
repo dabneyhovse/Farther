@@ -1,0 +1,19 @@
+.submit-form .row {
+    padding-bottom: 0.2em;
+    text-align: right;
+}
+
+.vid-listed img {
+    margin-bottom: 1em;
+}
+
+
+.controls button {
+    font-size: 1em;
+    min-width: 3em;
+    line-height: 2;
+    text-align: center;
+}
+.btn-weight {
+    width: 33.333333%;
+}
