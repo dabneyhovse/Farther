@@ -3,6 +3,9 @@
     text-align: right;
 }
 
+#playing_now .alert {
+    text-align: center;
+}
 .vid-listed img {
     margin-bottom: 1em;
 }

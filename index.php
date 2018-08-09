@@ -63,7 +63,7 @@
         	            <p>Uploaded by <a href="${data.current.author_url}">${data.current.author_name}</a></p>
                     </div>`;
     	    } else {
-                document.getElementById('playing_now').innerHTML = `<h3>No Song Playing.</h3>`;
+                document.getElementById('playing_now').innerHTML = `<div class="alert alert-success"><h3>No Song Playing.</h3></div>`;
             }
         });
     }
