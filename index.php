@@ -15,17 +15,17 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
     <!-- Dabney things -->
-    <link rel="stylesheet" href="static/service_style.css">
-    <script src="static/accessibility.js"></script>
+    <link rel="stylesheet" href="/static/service_style.css">
+    <script src="/static/accessibility.js"></script>
 
     <!-- app-specific -->
-    <link rel="stylesheet" href="static/farther.css">
+    <link rel="stylesheet" href="farther.css">
 </head>
 <body>
     <div id="site-container" class="container">
     <div id="page-header">
         <a href="/" class="col-md-2 col-sm-3 col-xs-4">
-            <img src="static/full-crest.png">
+            <img src="/static/full-crest.png">
         </a>
         <div class="col-md-10 col-sm-9 col-xs-8">
             <h1>Farther</h1>
@@ -68,9 +68,7 @@
         });
     }
     function get_req(action) {
-        fetch(`/process.php?action=${action}`, {
-            credentials: 'include',
-        }).then(update());
+        fetch(`http://localhost:5000/${action}`).then(update());
     }
 
     let lock = false;

@@ -1,6 +1,6 @@
 <?php
 
-$PYTHON_SERVER = "http://localhost:27036/";
+$PYTHON_SERVER = "http://localhost:5000/";
 
 $code = 200;
 $message = 'Success.';
@@ -34,7 +34,7 @@ function extract_vid_id($data) {
     if ($parsed['host'] === 'youtu.be') {
     	return (substr($parsed['path'], 1));
     }
-    
+
     // Parse the query string into an array.
     parse_str($parsed['query'], $query);
 
@@ -112,7 +112,7 @@ EOF
     );
 
     $result->execute(array(
-        ':user' => $_SERVER['PHP_AUTH_USER'],
+        ':user' => $_POST['user'],
         ':v' => $v,
         ':note' => $note
     ));
@@ -170,7 +170,7 @@ EOF
         $author_url = htmlentities($data->author_url, null, 'UTF-8');
         $thumbnail = htmlentities($data->thumbnail_url, null, 'UTF-8');
         $note = htmlentities($row['note'], null, 'UTF-8');
-        
+
 	$song = array(
             'url' => $url,
             'title' => $title,
@@ -187,15 +187,15 @@ EOF
     $data = call_get_api($PYTHON_SERVER . 'status');
     unset($data['queue']);
     unset($data['status']);
-    
-    if ($data['current'] != null) { 
+
+    if ($data['current'] != null) {
 	$url = 'http://www.youtube.com/watch?v=' . $data['current'];
 	$curr_data = get_vid_data($data['current']);
 	$title = htmlentities($curr_data->title, null, 'UTF-8');
 	$author_name = htmlentities($curr_data->author_name, null, 'UTF-8');
 	$author_url = htmlentities($curr_data->author_url, null, 'UTF-8');
 	$thumbnail = htmlentities($curr_data->thumbnail_url, null, 'UTF-8');
-	
+
 	$current = array(
 	'url' => $url,
 	'title' => $title,
@@ -204,7 +204,7 @@ EOF
 	'thumbnail' => $thumbnail
 	);
 	$data['current'] = $current;
-    }	
+    }
 
     $data['songs'] = $songs;
 
@@ -216,4 +216,3 @@ EOF
 }
 
 ?>
-
