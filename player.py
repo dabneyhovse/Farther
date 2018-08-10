@@ -3,7 +3,7 @@ from time import time,sleep
 import os, glob
 from collections import namedtuple
 from subprocess import Popen
-import urllib
+import urllib.request
 import json
 
 STATUS_URL = "http://localhost:5000/status"
@@ -49,17 +49,17 @@ def check_downloads():
             # taking too long or download failed (returned nonzero without being killed)
 set_interval(check_downloads, 5)
 
-# def dl_queue():
-#     f = urllib.urlopen(STATUS_URL)
-#     data = json.load(f)
-#     to_download = set(data["queue"])
-#     to_download.add(data["current"])
-#     for id in to_download:
-#         if not dl_statuses.get(id): # if status is true or DownloadProgress tuple, no action required
-#             download_song(id)
-# set_interval(dl_queue, 5)
+def dl_queue():
+    f = urllib.request.urlopen(STATUS_URL)
+    data = json.load(f)
+    to_download = set(data["queue"])
+    to_download.add(data["current"])
+    for id in to_download:
+        if not dl_statuses.get(id): # if status is true or DownloadProgress tuple, no action required
+            download_song(id)
+set_interval(dl_queue, 5)
 
-def start(id, start_time=0):
+def play(id, start_time=0):
     if dl_statuses.get(id) is None:
         download_song(id)
     while dl_statuses.get(id) is not True:
@@ -99,5 +99,3 @@ set_interval(stop_if_done, 1)
 
 def get_time():
     return time() - current_song_start
-
-socketIO.wait(seconds=100)

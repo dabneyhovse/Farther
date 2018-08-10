@@ -1,6 +1,7 @@
 from socketIO_client import SocketIO,LoggingNamespace
 from time import time
 from interval import *
+import player
 
 socket = SocketIO('localhost', 5000)
 
@@ -27,9 +28,11 @@ socket.on('status', on_status)
 pingTimes = []
 pingSent = 0
 def ping():
+    global pingSent
     pingSent = time()
     socket.emit('cl_ping')
-def pong():
+def pong(*args):
+    global pingTimes
     latency = time() - pingSent;
     pingTimes.append(latency);
     pingTimes = pingTimes[-30:]
@@ -43,11 +46,13 @@ def on_play(req):
     player.play(req.video, req.start)
 socket.on('play', on_play)
 
-def on_pause():
+def on_pause(*args):
     socket.emit('paused', player.get_time())
     player.stop()
 socket.on('pause', on_pause)
 
-def on_skip():
+def on_skip(*args):
     player.stop()
 socket.on('skip', on_skip)
+
+socket.wait(seconds=100)
