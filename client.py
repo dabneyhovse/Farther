@@ -40,7 +40,7 @@ socket.on('sv_pong', pong)
 set_interval(ping, 10)
 
 def on_play(req):
-    player.play("https://youtube.com/watch?v=" + req.video, req.start)
+    player.play(req.video, req.start)
 socket.on('play', on_play)
 
 def on_pause():
