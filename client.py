@@ -1,4 +1,4 @@
-from socketIO_client import SocketIO
+from socketIO_client import SocketIO,LoggingNamespace
 from time import time
 from interval import *
 
@@ -51,29 +51,3 @@ socket.on('pause', on_pause)
 def on_skip():
     player.stop()
 socket.on('skip', on_skip)
-
-
-# TODO
-# when you lose connection:
-#   reconnection: true,
-#  reconnectionDelay: 500,
-#  reconnectionAttempts: 10,
-#  socket.disconnect();
-# player.stop();
-# socket.connect();
-# on exit
-  # // Emitted when the window is closed.
-  # mainWindow.on('closed', () => {
-  #   // Stop pinging boi.
-  #   clearInterval(pingInterval);
-  #
-  #   // Stop the player and close the socket.
-  #   closed = true;
-  #   player.stop();
-  #   socket.disconnect();
-  #
-  #   // Dereference window object.
-  #   mainWindow = null;
-  #
-  #   // Quit the app.
-  #   app.quit();
