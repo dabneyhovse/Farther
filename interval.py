@@ -1,6 +1,6 @@
 import threading
 
-def set_interval(func, sec, args=(,)):
+def set_interval(func, sec, args=()):
     def func_wrapper():
         set_interval(func, sec)
         func(*args)
