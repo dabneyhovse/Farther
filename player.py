@@ -8,7 +8,7 @@ import json
 
 STATUS_URL = "http://localhost:5000/status"
 
-dl_statuses = {}
+dl_statuses = {"dQw4w9WgXcQ": True}
 # id => True if saved, DownloadProgress tuple otherwise
 DownloadProgress = namedtuple('DownloadProgress', 'start_time download_proc')
 DOWNLOAD_TIMEOUT = 420 # blaze it
@@ -57,13 +57,16 @@ def dl_queue():
     for id in to_download:
         if not dl_statuses.get(id): # if status is true or DownloadProgress tuple, no action required
             download_song(id)
-set_interval(dl_queue, 5)
+# dl_queue() #set_interval(dl_queue, 5)
 
 def play(id, start_time=0):
-    if dl_statuses.get(id) is None:
-        download_song(id)
+    print("play requested for {}, starting at {}".format(id, start_time))
     while dl_statuses.get(id) is not True:
-        continue # wait for song to download
+        time.sleep(1) # wait for song to download by the queue checker
+
+    global current_song
+    global current_song_start
+    global player_proc
 
     assert current_song is None
     current_song = id
@@ -86,16 +89,26 @@ def play(id, start_time=0):
     player_proc = Popen(command)
 
 def stop():
+    global current_song
+    global player_proc
+
     player_proc.kill()
     player_proc = None
     current_song = None
 
 def stop_if_done():
+    global player_proc
+
     if player_proc:
         player_proc.poll()
         if player_proc.returncode is not None:
             stop()
-set_interval(stop_if_done, 1)
+            return True
+    return False
 
 def get_time():
-    return time() - current_song_start
+    global current_song
+    global current_song_start
+
+    if current_song:
+        return time() - current_song_start
