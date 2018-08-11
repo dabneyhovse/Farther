@@ -6,6 +6,9 @@
 #playing_now .alert {
     text-align: center;
 }
+#client_status .alert {
+    text-align: center;
+}
 .vid-listed img {
     margin-bottom: 1em;
 }

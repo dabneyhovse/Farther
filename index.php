@@ -35,7 +35,7 @@
     <script>
     function update() {
         console.log('updating...');
-        fetch('/process.php?status', {
+        fetch('process.php?status', {
             credentials: 'include',
         }).then(res => res.json()).then(data => {
             let song_div_inner = '';
@@ -53,6 +53,12 @@
             });
             document.getElementById('recently_added').innerHTML = song_div_inner;
 
+            if (data.client_connected) {
+                $('#client_status').html(`<h3 class='alert alert-success'>Client connected and ${data.status}</h3>`);
+            } else {
+                $('#client_status').html("<h3 class='alert alert-danger'>Client disconnected.</h3>");
+            }
+
             if (data.current) {
     	        document.getElementById('playing_now').innerHTML = `\
                     <img src="${data.current.thumbnail}" class="col-md-3 col-sm-5 col-xs-12" />
@@ -63,7 +69,7 @@
         	            <p>Uploaded by <a href="${data.current.author_url}">${data.current.author_name}</a></p>
                     </div>`;
     	    } else {
-                document.getElementById('playing_now').innerHTML = `<div class="alert alert-success"><h3>No Song Playing.</h3></div>`;
+                document.getElementById('playing_now').innerHTML = `<div class="alert alert-info"><h3>No Song Playing.</h3></div>`;
             }
         });
     }
@@ -137,6 +143,8 @@
                 </div>
             </div>
         </div>
+
+        <div id="client_status"></div>
 
         <h2>Playing Now</h2>
         <div id="playing_now" class="row">

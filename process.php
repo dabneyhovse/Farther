@@ -75,11 +75,12 @@ function queue_control($control) {
     }
 }
 
-$create = !file_exists('nearer.db');
-$pdo = new PDO('sqlite:nearer.db');
+$create = !file_exists('farther.db');
+$pdo = new PDO('sqlite:farther.db');
 
 function nearer_record($v, $note) {
     global $pdo;
+    global $create;
 
     if ($create) {
         $pdo->exec(
@@ -186,7 +187,7 @@ EOF
 
     $data = call_get_api($PYTHON_SERVER . 'status');
     unset($data['queue']);
-    unset($data['status']);
+    //unset($data['status']);
 
     if ($data['current'] != null) {
 	$url = 'http://www.youtube.com/watch?v=' . $data['current'];
