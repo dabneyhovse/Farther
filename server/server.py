@@ -138,6 +138,7 @@ def resumeQueue():
 def skip():
     print('Skip requested.')
     socketio.emit('skip')
+    playNext()
     return json.dumps({ "message": "Success!", "queue": list(queue.queue)})
 
 @socketio.on('done')

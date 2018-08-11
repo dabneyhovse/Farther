@@ -39,19 +39,22 @@ def pong(*args):
 set_interval(ping, 10)
 
 def on_play(req):
-    player.play(str(req["video"]), req["start"])
+    print("Pley requested for {} at {}".format( req["video"], req["start"] ))
+    player.play(req["video"], req["start"])
 
 def on_pause(*args):
+    print("Paused at {}".format(player.get_time()))
     socket.emit('paused', player.get_time())
     player.stop()
 
 def on_skip(*args):
+    print("Received skip request")
     player.stop()
 
 def check_done(*args):
     if player.stop_if_done():
         socket.emit("done")
-
+set_interval(check_done, 5)
 
 socket = SocketIO('localhost', 5000)
 socket.on('connect', on_connect)
