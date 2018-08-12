@@ -22,8 +22,7 @@ player_proc = None
 def download_song(id):
     print("Starting download of {}".format(id))
 
-    # TODO: actually download
-    proc = Popen(["./fake_downloader.sh", id])
+    proc = Popen(["youtube-dl", "https://youtube.com/watch?v=" + id, "-o", "vids/" + id ])
 
     dl_statuses[id] = DownloadProgress(time(), proc)
 def retry_download(id):
@@ -73,19 +72,19 @@ def play(id, start_time=0):
     current_song = id
     current_song_start = time() - start_time
 
-    command = ["./fake_player.sh", "vids/{}.mkv".format(id)]
+    command = ["omxplayer", "vids/{}.mkv".format(id)]
+    # TODO: -o both
 
-    # if start_time != 0:
-    #     seconds = start_time
-    #     hours = seconds // 3600
-    #     seconds -= 3600 * hours
-    #     minutes = seconds // 60
-    #     seconds -= 60 * minutes
-    #     timestamp = "{}:{}:{}".format(hours, minutes, seconds)
-    #
-    #     command.insert(1, timestamp)
-    #     command.insert(1, "--pos")
-        # syntax: ./fake_player.sh --pos {timestamp} vids/{id}.mkv
+    if start_time != 0:
+        seconds = start_time
+        hours = seconds // 3600
+        seconds -= 3600 * hours
+        minutes = seconds // 60
+        seconds -= 60 * minutes
+        timestamp = "{}:{}:{}".format(hours, minutes, seconds)
+
+        command.insert(1, timestamp)
+        command.insert(1, "--pos")
 
     player_proc = Popen(command)
 
