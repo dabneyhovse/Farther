@@ -47,6 +47,7 @@
                             <a href="${song.url}">${song.title}</a>
                         </h4>
                         <p>Uploaded by <a href="${song.author_url}">${song.author_name}</a></p>
+                        <p>Added by ${song.added_by} on ${song.added_on}</p>
                     </div>
                 </div>`;
                 song_div_inner += song_element;
