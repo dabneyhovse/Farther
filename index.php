@@ -74,7 +74,7 @@
         });
     }
     function get_req(action) {
-        fetch(`http://localhost:5000/${action}`).then(update());
+        fetch(`http://dabney.caltech.edu:27036/${action}`).then(update());
     }
 
     let lock = false;

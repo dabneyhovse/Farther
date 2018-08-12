@@ -1,6 +1,6 @@
 <?php
 
-$PYTHON_SERVER = "http://localhost:5000/";
+$PYTHON_SERVER = "http://localhost:27036/";
 
 $code = 200;
 $message = 'Success.';
