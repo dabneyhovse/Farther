@@ -56,7 +56,7 @@ def check_done(*args):
         socket.emit("done")
 set_interval(check_done, 5)
 
-socket = SocketIO('localhost', 5000)
+socket = SocketIO('dabney.caltech.edu', 27036)
 socket.on('connect', on_connect)
 socket.on('disconnect', on_disconnect)
 socket.on('reconnect', on_reconnect)

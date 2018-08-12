@@ -6,7 +6,7 @@ from subprocess import Popen
 import urllib.request
 import json
 
-STATUS_URL = "http://localhost:5000/status"
+STATUS_URL = "http://dabney.caltech.edu:27036/status"
 
 dl_statuses = {}
 # id => True if saved, DownloadProgress tuple otherwise
