@@ -9,6 +9,10 @@ import json
 STATUS_URL = "http://dabney.caltech.edu:27036/status"
 
 dl_statuses = {}
+for filename in glob.glob("vids/*.mkv"):
+    dl_statuses[filename[5:-4]] = True
+    # if a .mkv exists already, it's a safe bet that it's downloaded
+
 # id => True if saved, DownloadProgress tuple otherwise
 DownloadProgress = namedtuple('DownloadProgress', 'start_time download_proc')
 DOWNLOAD_TIMEOUT = 69 # nice
@@ -86,14 +90,14 @@ def play(id, start_time=0):
         command.insert(1, timestamp)
         command.insert(1, "--pos")
 
-    player_proc = Popen(command)
+    player_proc = Popen(command, stdin=PIPE)
 
 def stop():
     global current_song
     global player_proc
 
     if player_proc:
-        player_proc.kill()
+        Popen(["killall", "omxplayer.bin"])
     player_proc = None
     current_song = None
 
