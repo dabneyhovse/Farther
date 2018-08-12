@@ -90,7 +90,7 @@ def play(id, start_time=0):
         command.insert(1, timestamp)
         command.insert(1, "--pos")
 
-    player_proc = Popen(command, stdin=PIPE)
+    player_proc = Popen(command)
 
 def stop():
     global current_song
