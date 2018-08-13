@@ -35,9 +35,7 @@
     <script>
     function update() {
         console.log('updating...');
-        fetch('process.php?status', {
-            credentials: 'include',
-        }).then(res => res.json()).then(data => {
+        fetch('process.php?status').then(res => res.json()).then(data => {
             let song_div_inner = '';
             data.songs.forEach((song) => {
                 let song_element = `<div class="row vid-listed">
@@ -48,6 +46,7 @@
                         </h4>
                         <p>Uploaded by <a href="${song.author_url}">${song.author_name}</a></p>
                         <p>Added by ${song.added_by} on ${song.added_on}</p>
+                        <p>${song.note}</p>
                     </div>
                 </div>`;
                 song_div_inner += song_element;
