@@ -17,7 +17,8 @@ for filename in glob.glob("vids/*.mkv"):
 DownloadProgress = namedtuple('DownloadProgress', 'start_time download_proc')
 DOWNLOAD_TIMEOUT = 69 # nice
 
-log_file = open("output.log", "w+")
+#log_file = open("output.log", "w+")
+# TODO: log youtube-dl and omxplayer separately
 
 current_song = None
 current_song_start = None
