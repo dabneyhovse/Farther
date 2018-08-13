@@ -1,9 +1,10 @@
 <?php
 
-$caltech_ips = '131.215.[0-9]{1,3}.[0-9]{1,3}';
+$caltech_ips = '/131.215.[0-9]{1,3}.[0-9]{1,3}/';
 $ip = $_SERVER['REMOTE_ADDR'];
 
 if ($ip != '127.0.0.1' && !preg_match($caltech_ips, $ip)) {
+    echo "{\"message\": \"You must be on the Caltech network to use Farther.\"}";
     http_response_code(403);
     exit();
 }
