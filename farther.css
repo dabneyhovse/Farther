@@ -2,6 +2,10 @@
     padding-bottom: 0.2em;
     text-align: right;
 }
+.submit-form input {
+    padding-left: 5px;
+    padding-right: 5px;
+}
 
 #playing_now .alert {
     text-align: center;
@@ -12,14 +16,11 @@
 .vid-listed img {
     margin-bottom: 1em;
 }
-
-
-.controls button {
-    font-size: 1em;
-    min-width: 3em;
-    line-height: 2;
+.section-header h2 {
     text-align: center;
 }
-.btn-weight {
-    width: 33.333333%;
+
+.controls button {
+    font-size: 1.2em;
+    line-height: 2;
 }

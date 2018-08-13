@@ -23,7 +23,7 @@
 </head>
 <body>
     <div id="site-container" class="container">
-    <div id="page-header">
+    <div id="page-header" class="row">
         <a href="/" class="col-md-2 col-sm-3 col-xs-4">
             <img src="/static/full-crest.png">
         </a>
@@ -84,33 +84,49 @@
 
             let url = $('#url').val();
             let note = $('#note').val();
+            let user = $("#user").val();
 
             let formData = new FormData();
             formData.append('url', url);
             formData.append('note', note);
-            formData.append('user', $("#user").val());
+            formData.append('user', user);
             // TODO: store in localStorage or something, we don't want a
             // formal login system
 
-            fetch('process.php', {
-                method: 'POST',
-                body: formData,
-            }).then((res) => {
-                lock = false;
-                update();
-                if (res.status === 200) {
-                    res = res.json();
-                    $('#url').val('');
-                    $('#note').val('');
+            var error = null;
+            if (user == "") {
+                error = "Error! Name is required.";
+            } else if (url == "") {
+                error = "Error! YouTube URL is required.";
+            }
 
-                    $('#success_div').css('display', '');
-                    setTimeout(() => { $('#success_div').css('display', 'none') }, 5000);
-                } else {
-                    $('#error_code').text(res.status);
-                    $('#failure_div').css('display', '');
-                    setTimeout(() => { $('#failure_div').css('display', 'none') }, 5000);
-                }
-            });
+            if (error) {
+                $('#js_error_div').text(error);
+                $('#js_error_div').css('display', '');
+                clearTimeout(); // prevent odd behavior of overlapping timeout windows
+                setTimeout(() => { $('#js_error_div').css('display', 'none') }, 5000);
+                lock = false;
+            } else {
+                fetch('process.php', {
+                    method: 'POST',
+                    body: formData,
+                }).then((res) => {
+                    lock = false;
+                    update();
+                    if (res.status === 200) {
+                        res = res.json();
+                        $('#url').val('');
+                        $('#note').val('');
+
+                        $('#success_div').css('display', '');
+                        setTimeout(() => { $('#success_div').css('display', 'none') }, 5000);
+                    } else {
+                        $('#error_code').text(res.status);
+                        $('#failure_div').css('display', '');
+                        setTimeout(() => { $('#failure_div').css('display', 'none') }, 5000);
+                    }
+                });
+            }
         }
     }
 
@@ -124,7 +140,7 @@
     });
 
     </script>
-    <div id="page-content">
+    <div id="page-content" class="row col-xs-12">
         <div class="row">
             <div id="success_div" class="alert alert-success col-xs-12" style="display: none">
                 Success! Song added to queue.
@@ -132,9 +148,12 @@
             <div id="failure_div" class="alert alert-danger col-xs-12" style="display: none">
                 Error! Song not added to queue. Error code: <a id="error_code"></a>
             </div>
+            <div id="js_error_div" class="alert alert-danger col-xs-12" style="display: none">
+
+            </div>
         </div>
 
-        <div class="submit-form">
+        <span class="submit-form" aria-label="song submission">
             <div class="row">
                 <label class="col-sm-4 col-xs-12" for="user">Whomst are you?</label>
                 <input class="col-sm-8 col-xs-12" type="text" id="user" name="user" />
@@ -150,23 +169,29 @@
             <div class="row">
                 <button class="btn btn-primary col-sm-offset-4 col-sm-2 col-xs-12" onclick="submit_song();" class="control">Submit</button>
 
-                <div class="controls btn-group col-sm-offset-2 col-sm-4 col-xs-12" role="group" aria-label="player controls">
-                    <button class="btn btn-success btn-weight" onclick="get_req('resume')">&#9654;</button>
-                    <button class="btn btn-success btn-weight" onclick="get_req('skip')">&#9197;</button>
-                    <button class="btn btn-success btn-weight" onclick="get_req('pause')">&#9724;</button>
+                <div class="col-sm-offset-2 col-sm-4 col-xs-12">
+                    <div class="row controls" aria-label="player controls">
+                        <button class="btn btn-success col-xs-4" onclick="get_req('resume')">&#9654;</button>
+                        <button class="btn btn-success col-xs-4" onclick="get_req('skip')">&#9197;</button>
+                        <button class="btn btn-success col-xs-4" onclick="get_req('pause')">&#9724;</button>
+                    </div>
                 </div>
             </div>
+        </span>
+
+        <div id="client_status" class="row"></div>
+
+        <div class="row section-header">
+            <h2>Playing Now</h2>
         </div>
-
-        <div id="client_status"></div>
-
-        <h2>Playing Now</h2>
         <div id="playing_now" class="row">
 
         </div>
 
-        <h2>Recently Added</h2>
-        <div id="recently_added">
+        <div class="row section-header">
+            <h2>Recently Added</h2>
+        </div>
+        <div id="recently_added" class="row">
 
         </div>
 
@@ -175,7 +200,7 @@
         let updateInterval = setInterval(update, 30000);
         </script>
     </div>
-    <div id="page-footer">
+    <div id="page-footer" class="row col-xs-12">
 
         <hr />
         <div class="accessibility">
