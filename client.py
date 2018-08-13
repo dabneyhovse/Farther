@@ -1,3 +1,5 @@
+#! /usr/local/bin/python3.6
+
 from socketIO_client import SocketIO
 from time import time
 from interval import *
