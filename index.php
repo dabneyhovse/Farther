@@ -141,6 +141,19 @@
 
     </script>
     <div id="page-content" class="row col-xs-12">
+        <?php
+        $caltech_ips = '/131.215.[0-9]{1,3}.[0-9]{1,3}/';
+        $ip = $_SERVER['REMOTE_ADDR'];
+
+        if ($ip != '127.0.0.1' && !preg_match($caltech_ips, $ip)) :
+        ?>
+        <div class="row">
+            <div id="bad_ip_div" class="alert alert-warning col-xs-12">
+                Warning! You must connect be on the Caltech network to use Farther.
+            </div>
+        </div>
+        <?php endif; ?>
+
         <div class="row">
             <div id="success_div" class="alert alert-success col-xs-12" style="display: none">
                 Success! Song added to queue.
