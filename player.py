@@ -118,3 +118,5 @@ def get_time():
 
     if current_song:
         return time() - current_song_start
+    else:
+        return 0
