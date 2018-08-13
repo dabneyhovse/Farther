@@ -89,7 +89,7 @@
             let formData = new FormData();
             formData.append('url', url);
             formData.append('note', note);
-            formData.append('user', "testuser");
+            formData.append('user', $("#user").val());
             // TODO: store in localStorage or something, we don't want a
             // formal login system
 
@@ -114,6 +114,16 @@
             });
         }
     }
+
+    $(function() {
+        $("#user").val(localStorage.getItem("username"));
+
+        $("#user").change(function () {
+            console.log("change");
+            localStorage.setItem("username", $("#user").val());
+        });
+    });
+
     </script>
     <div id="page-content">
         <div class="row">
@@ -126,6 +136,10 @@
         </div>
 
         <div class="submit-form">
+            <div class="row">
+                <label class="col-sm-4 col-xs-12" for="user">Whomst are you?</label>
+                <input class="col-sm-8 col-xs-12" type="text" id="user" name="user" />
+            </div>
             <div class="row">
                 <label class="col-sm-4 col-xs-12" for="url">YouTube URL</label>
                 <input class="col-sm-8 col-xs-12" type="text" id="url" name="url" />
