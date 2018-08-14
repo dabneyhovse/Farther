@@ -28,7 +28,7 @@ player_proc = None
 def download_song(id):
     print("Starting download of {}".format(id))
 
-    proc = Popen(["youtube-dl", "https://youtube.com/watch?v=" + id, "-o", "vids/" + id, "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" ])
+    proc = Popen(["youtube-dl", "https://youtube.com/watch?v=" + id, "-o", "vids/" + id, "-f", "worstvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" ])
 
     dl_statuses[id] = DownloadProgress(time(), proc)
 def retry_download(id):
