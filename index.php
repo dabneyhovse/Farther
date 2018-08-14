@@ -144,7 +144,7 @@
         <div id="page-content" class="col-xs-12">
             <?php
             require_once("check_ip.php");
-            if (valid_ip($_SERVER['REMOTE_ADDR'])) :
+            if (! valid_ip($_SERVER['REMOTE_ADDR'])) :
             ?>
             <div class="row">
                 <div id="bad_ip_div" class="alert alert-warning col-xs-12">

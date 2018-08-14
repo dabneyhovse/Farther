@@ -2,7 +2,7 @@
 
 require_once("check_ip.php");
 
-if (valid_ip($_SERVER['REMOTE_ADDR'])) {
+if (! valid_ip($_SERVER['REMOTE_ADDR'])) {
     echo "{\"message\": \"You must be on the Caltech network to use Farther.\"}";
     http_response_code(403);
     exit();
