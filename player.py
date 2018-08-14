@@ -82,8 +82,7 @@ def play(id, start_time=0):
     vid_format = dl_statuses[id]
     current_song_start = time() - start_time
 
-    command = ["omxplayer", "vids/{}.{}".format(id, vid_format)]
-    # TODO: -o both
+    command = ["omxplayer", "-o", "both", "vids/{}.{}".format(id, vid_format)]
 
     if start_time != 0:
         seconds = start_time
