@@ -140,93 +140,97 @@
     });
 
     </script>
-    <div id="page-content" class="row col-xs-12">
-        <?php
-        $caltech_ips = '/131.215.[0-9]{1,3}.[0-9]{1,3}/';
-        $ip = $_SERVER['REMOTE_ADDR'];
+    <div class="row">
+        <div id="page-content" class="col-xs-12">
+            <?php
+            $caltech_ips = '/131.215.[0-9]{1,3}.[0-9]{1,3}/';
+            $ip = $_SERVER['REMOTE_ADDR'];
 
-        if ($ip != '127.0.0.1' && !preg_match($caltech_ips, $ip)) :
-        ?>
-        <div class="row">
-            <div id="bad_ip_div" class="alert alert-warning col-xs-12">
-                Warning! You must connect be on the Caltech network to use Farther.
-            </div>
-        </div>
-        <?php endif; ?>
-
-        <div class="row">
-            <div id="success_div" class="alert alert-success col-xs-12" style="display: none">
-                Success! Song added to queue.
-            </div>
-            <div id="failure_div" class="alert alert-danger col-xs-12" style="display: none">
-                Error! Song not added to queue. Error code: <a id="error_code"></a>
-            </div>
-            <div id="js_error_div" class="alert alert-danger col-xs-12" style="display: none">
-
-            </div>
-        </div>
-
-        <span class="submit-form" aria-label="song submission">
+            if ($ip != '127.0.0.1' && !preg_match($caltech_ips, $ip)) :
+            ?>
             <div class="row">
-                <label class="col-sm-4 col-xs-12" for="user">Whomst are you?</label>
-                <input class="col-sm-8 col-xs-12" type="text" id="user" name="user" />
-            </div>
-            <div class="row">
-                <label class="col-sm-4 col-xs-12" for="url">YouTube URL</label>
-                <input class="col-sm-8 col-xs-12" type="text" id="url" name="url" />
-            </div>
-            <div class="row">
-                <label class="col-sm-4 col-xs-12" for="note">Note (optional)</label>
-                <input class="col-sm-8 col-xs-12" type="text" id="note" name="note" maxlength="255" />
-            </div>
-            <div class="row">
-                <button class="btn btn-primary col-sm-offset-4 col-sm-2 col-xs-12" onclick="submit_song();" class="control">Submit</button>
-
-                <div class="col-sm-offset-2 col-sm-4 col-xs-12">
-                    <div class="row controls" aria-label="player controls">
-                        <button class="btn btn-success col-xs-4" onclick="get_req('resume')">&#9654;</button>
-                        <button class="btn btn-success col-xs-4" onclick="get_req('skip')">&#9197;</button>
-                        <button class="btn btn-success col-xs-4" onclick="get_req('pause')">&#9724;</button>
-                    </div>
+                <div id="bad_ip_div" class="alert alert-warning col-xs-12">
+                    Warning! You must connect be on the Caltech network to use Farther.
                 </div>
             </div>
-        </span>
+            <?php endif; ?>
 
-        <div id="client_status" class="row"></div>
+            <div class="row">
+                <div id="success_div" class="alert alert-success col-xs-12" style="display: none">
+                    Success! Song added to queue.
+                </div>
+                <div id="failure_div" class="alert alert-danger col-xs-12" style="display: none">
+                    Error! Song not added to queue. Error code: <a id="error_code"></a>
+                </div>
+                <div id="js_error_div" class="alert alert-danger col-xs-12" style="display: none">
 
-        <div class="row section-header">
-            <h2>Playing Now</h2>
+                </div>
+            </div>
+
+            <span class="submit-form" aria-label="song submission">
+                <div class="row">
+                    <label class="col-sm-4 col-xs-12" for="user">Whomst are you?</label>
+                    <input class="col-sm-8 col-xs-12" type="text" id="user" name="user" />
+                </div>
+                <div class="row">
+                    <label class="col-sm-4 col-xs-12" for="url">YouTube URL</label>
+                    <input class="col-sm-8 col-xs-12" type="text" id="url" name="url" />
+                </div>
+                <div class="row">
+                    <label class="col-sm-4 col-xs-12" for="note">Note (optional)</label>
+                    <input class="col-sm-8 col-xs-12" type="text" id="note" name="note" maxlength="255" />
+                </div>
+                <div class="row">
+                    <button class="btn btn-primary col-sm-offset-4 col-sm-2 col-xs-12" onclick="submit_song();" class="control">Submit</button>
+
+                    <div class="col-sm-offset-2 col-sm-4 col-xs-12">
+                        <div class="row controls" aria-label="player controls">
+                            <button class="btn btn-success col-xs-4" onclick="get_req('resume')">&#9654;</button>
+                            <button class="btn btn-success col-xs-4" onclick="get_req('skip')">&#9197;</button>
+                            <button class="btn btn-success col-xs-4" onclick="get_req('pause')">&#9724;</button>
+                        </div>
+                    </div>
+                </div>
+            </span>
+
+            <div id="client_status" class="row"></div>
+
+            <div class="row section-header">
+                <h2>Playing Now</h2>
+            </div>
+            <div id="playing_now" class="row">
+
+            </div>
+
+            <div class="row section-header">
+                <h2>Recently Added</h2>
+            </div>
+            <div id="recently_added" class="row">
+
+            </div>
+
+            <script>
+            update();
+            let updateInterval = setInterval(update, 30000);
+            </script>
         </div>
-        <div id="playing_now" class="row">
-
-        </div>
-
-        <div class="row section-header">
-            <h2>Recently Added</h2>
-        </div>
-        <div id="recently_added" class="row">
-
-        </div>
-
-        <script>
-        update();
-        let updateInterval = setInterval(update, 30000);
-        </script>
     </div>
-    <div id="page-footer" class="row col-xs-12">
+    <div class="row">
+        <div id="page-footer" class="col-xs-12">
 
-        <hr />
-        <div class="accessibility">
-            <label for="accessibilityMode">Accessibility Mode</label>
-            <input id="accessibilityMode" type="checkbox" accesskey="a" />
+            <hr />
+            <div class="accessibility">
+                <label for="accessibilityMode">Accessibility Mode</label>
+                <input id="accessibilityMode" type="checkbox" accesskey="a" />
+            </div>
+
+            <p>
+                Copyright &copy; 2018 Nicholas Currault <br>
+                (partially derived from <a href="https://github.com/ejaszewski/nearer-client">Nearer</a>
+                under the MPL 2.0 license) <br>
+                A service of Dabney Hovse
+            </p>
         </div>
-
-        <p>
-            Copyright &copy; 2018 Nicholas Currault <br>
-            (partially derived from <a href="https://github.com/ejaszewski/nearer-client">Nearer</a>
-            under the MPL 2.0 license) <br>
-            A service of Dabney Hovse
-        </p>
     </div>
     </div>
 </body>
