@@ -143,10 +143,8 @@
     <div class="row">
         <div id="page-content" class="col-xs-12">
             <?php
-            $caltech_ips = '/131.215.[0-9]{1,3}.[0-9]{1,3}/';
-            $ip = $_SERVER['REMOTE_ADDR'];
-
-            if ($ip != '127.0.0.1' && !preg_match($caltech_ips, $ip)) :
+            require_once("check_ip.php");
+            if (valid_ip($_SERVER['REMOTE_ADDR'])) :
             ?>
             <div class="row">
                 <div id="bad_ip_div" class="alert alert-warning col-xs-12">
