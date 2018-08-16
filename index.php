@@ -207,7 +207,20 @@
 
             </div>
 
+            <div id="shortcutButtons" class="row">
+                <button class="submitShortcut btn btn-primary col-md-4 col-md-offset-4 col-sm-8 col-sm-offset-2 col-xs-12" data-ytid="SxTNhD5jTyQ">
+                    This is so sad. Farther, play <i>Despacito</i>.
+                </button>
+            </div>
+
             <script>
+            $(function () {
+                $(".submitShortcut").click(function() {
+                    $("#url").val( "https://youtube.com/watch?v=" + $(this).data("ytid") );
+                    submit_song();
+                });
+            });
+
             update();
             let updateInterval = setInterval(update, 30000);
             </script>
