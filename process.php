@@ -181,6 +181,9 @@ EOF
         $thumbnail = htmlentities($data->thumbnail_url, null, 'UTF-8');
         $note = htmlentities($row['note'], null, 'UTF-8');
 
+        $upload_time = new DateTime($row['created'], new DateTimeZone("UTC"));
+        $upload_time->setTimezone(new DateTimeZone('America/Los_Angeles'));
+
 	$song = array(
             'url' => $url,
             'title' => $title,
@@ -189,7 +192,7 @@ EOF
             'thumbnail' => $thumbnail,
             'note' => $note,
             'added_by' => $row['user'],
-            'added_on' => $row['created']
+            'added_on' => $upload_time->format('Y-m-d g:i:sa')
         );
         $songs[$i++] = $song;
     }
