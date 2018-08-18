@@ -148,10 +148,37 @@
             ?>
             <div class="row">
                 <div id="bad_ip_div" class="alert alert-warning col-xs-12">
-                    Warning! You must connect be on the Caltech network to use Farther.
+                    <span class="glyphicon glyphicon-map-marker"></span>
+                    <b>Warning!</b> You must connect be on the Caltech network to use Farther.
                 </div>
             </div>
             <?php endif; ?>
+
+            <?php
+            $current = new DateTime();
+            $current->setTimezone(new DateTimeZone('America/Los_Angeles'));
+
+            // quiet hours are 12am-7am on weekdays, 2am-7am on weekends
+            $quiet_start = clone $current;
+            $quiet_end = clone $current;
+            if ($current->format('w') == '0' || $current->format('w') == '6') {
+                $quiet_start->setTime(2, 0);
+            } else {
+                $quiet_start->setTime(0, 0);
+            }
+            $quiet_end->setTime(7, 0);
+
+            if ($current > $quiet_start && $current < $quiet_end) :
+            ?>
+            <div class="row">
+                <div id="bad_ip_div" class="alert alert-warning col-xs-12">
+                    <span class="glyphicon glyphicon-time"></span>
+                    <b>Warning!</b> It's currently within Quiet Hours, so music should not be played loudly.
+                </div>
+            </div>
+            <?php endif; ?>
+
+
 
             <div class="row">
                 <div id="success_div" class="alert alert-success col-xs-12" style="display: none">
@@ -183,9 +210,9 @@
 
                     <div class="col-sm-offset-2 col-sm-4 col-xs-12">
                         <div class="row controls" aria-label="player controls">
-                            <button class="btn btn-success col-xs-4" onclick="get_req('resume')">&#9654;</button>
-                            <button class="btn btn-success col-xs-4" onclick="get_req('skip')">&#9197;</button>
-                            <button class="btn btn-success col-xs-4" onclick="get_req('pause')">&#9724;</button>
+                            <button class="btn btn-success col-xs-4" onclick="get_req('resume')"><span class="glyphicon glyphicon-play"></span></button>
+                            <button class="btn btn-success col-xs-4" onclick="get_req('skip')"><span class="glyphicon glyphicon-fast-forward"></span></button>
+                            <button class="btn btn-success col-xs-4" onclick="get_req('pause')"><span class="glyphicon glyphicon-pause"></span></button>
                         </div>
                     </div>
                 </div>
