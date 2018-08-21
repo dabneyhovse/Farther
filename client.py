@@ -56,7 +56,7 @@ def on_skip(*args):
 def check_done(*args):
     if player.stop_if_done():
         socket.emit("done")
-set_interval(check_done, 5)
+set_interval(check_done, 1)
 
 socket = SocketIO('dabney.caltech.edu', 27036)
 socket.on('connect', on_connect)
