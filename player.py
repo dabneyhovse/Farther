@@ -38,7 +38,7 @@ def download_song(id):
     if VIDEO:
         proc = Popen(["youtube-dl", "https://youtube.com/watch?v=" + id, "-o", "vids/" + id, "-f", "worstvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" ])
     else:
-        proc = Popen(["youtube-dl", "https://youtube.com/watch?v=" + id, "-o", "vids/" + id, "-f", "bestaudio[ext=m4a]" ])
+        proc = Popen(["youtube-dl", "https://youtube.com/watch?v=" + id, "-o", "vids/" + id + ".m4a", "-f", "bestaudio[ext=m4a]" ])
 
     dl_statuses[id] = DownloadProgress(time(), proc)
 def retry_download(id):
