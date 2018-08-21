@@ -235,7 +235,7 @@
             </div>
 
             <div id="shortcutButtons" class="row">
-                <button class="submitShortcut btn btn-primary col-md-4 col-md-offset-4 col-sm-8 col-sm-offset-2 col-xs-12" data-ytid="SxTNhD5jTyQ">
+                <button class="submitShortcut btn btn-primary col-md-4 col-md-offset-4 col-sm-8 col-sm-offset-2 col-xs-12" data-ytid="kJQP7kiw5Fk">
                     This is so sad. Farther, play <i>Despacito</i>.
                 </button>
             </div>
