@@ -8,9 +8,16 @@ import json
 
 STATUS_URL = "http://dabney.caltech.edu:27036/status"
 
+VIDEO = False # TODO: auto-detect if an HDMI is plugged in
+
 dl_statuses = {}
 for filename in glob.glob("vids/*"):
-    dl_statuses[filename[5:filename.find(".")]] = filename[filename.find(".")+1:]
+    if (VIDEO and filename.endswith("m4a")): # audio files aren't any good in video mode
+        continue
+    elif filename.endswith("part"): # only partially downloaded
+        continue
+    else:
+        dl_statuses[filename[5:filename.find(".")]] = filename[filename.find(".")+1:]
     # if a file exists already, it's a safe bet that it's downloaded
 print(dl_statuses)
 
@@ -28,7 +35,10 @@ player_proc = None
 def download_song(id):
     print("Starting download of {}".format(id))
 
-    proc = Popen(["youtube-dl", "https://youtube.com/watch?v=" + id, "-o", "vids/" + id, "-f", "worstvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" ])
+    if VIDEO:
+        proc = Popen(["youtube-dl", "https://youtube.com/watch?v=" + id, "-o", "vids/" + id, "-f", "worstvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" ])
+    else:
+        proc = Popen(["youtube-dl", "https://youtube.com/watch?v=" + id, "-o", "vids/" + id, "-f", "bestaudio[ext=m4a]" ])
 
     dl_statuses[id] = DownloadProgress(time(), proc)
 def retry_download(id):
@@ -82,7 +92,7 @@ def play(id, start_time=0):
     vid_format = dl_statuses[id]
     current_song_start = time() - start_time
 
-    command = ["omxplayer", "-o", "both", "vids/{}.{}".format(id, vid_format)]
+    command = ["omxplayer", "-o", ("both" if VIDEO else "local"), "vids/{}.{}".format(id, vid_format)]
 
     if start_time != 0:
         seconds = start_time
