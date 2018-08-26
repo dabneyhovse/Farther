@@ -27,7 +27,7 @@ def prep_queue():
     if data.get("current") is not None:
         to_download.add(data["current"])
     for id in to_download:
-        get_player_url(id): # ensure we have a player url for everybody in the queue
+        get_player_url(id) # ensure we have a player url for everybody in the queue
 set_interval(prep_queue, 10)
 
 def play(id, start_time=0):
