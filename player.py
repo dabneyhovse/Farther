@@ -1,7 +1,9 @@
 import pafy
 from omxplayer.player import OMXPlayer, OMXPlayerDeadError
 from interval import *
+import urllib.request
 import json
+
 
 STATUS_URL = "http://dabney.caltech.edu:27036/status"
 VIDEO = False # TODO: auto-detect if an HDMI is plugged in
