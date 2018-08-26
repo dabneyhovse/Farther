@@ -7,7 +7,7 @@ player = None
 stop_time = 0
 
 url_cache = {}
-def get_url(id):
+def get_player_url(id):
     if id not in url_cache:
         video = pafy.new("https://youtube.com/watch?v=" + id)
         if VIDEO:
@@ -19,6 +19,8 @@ def get_url(id):
 
 def play(id, start_time=0):
     print("play requested for {}, starting at {}".format(id, start_time))
+
+    play_url = get_player_url(id)
 
     args = ["-o", "both"] if VIDEO else ["-o", "local"]
     if start_time != 0:
@@ -32,7 +34,7 @@ def play(id, start_time=0):
 
     global player
     if player is None:
-        player = OMXPlayer(target.url, args=args)
+        player = OMXPlayer(play_url, args=args)
 
 def stop():
     global player
