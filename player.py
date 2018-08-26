@@ -1,8 +1,7 @@
 import pafy
 from omxplayer.player import OMXPlayer, OMXPlayerDeadError
 from interval import *
-import urllib.request
-import json
+import requests
 
 
 STATUS_URL = "http://dabney.caltech.edu:27036/status"
@@ -23,8 +22,8 @@ def get_player_url(id):
     return url_cache[id]
 
 def prep_queue():
-    f = urllib.request.urlopen(STATUS_URL)
-    data = json.load(f)
+    f = requests.get(STATUS_URL)
+    data = f.json()
     to_download = set(data["queue"])
     if data.get("current") is not None:
         to_download.add(data["current"])
