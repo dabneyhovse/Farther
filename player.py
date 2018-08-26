@@ -6,14 +6,19 @@ VIDEO = False # TODO: auto-detect if an HDMI is plugged in
 player = None
 stop_time = 0
 
+url_cache = {}
+def get_url(id):
+    if id not in url_cache:
+        video = pafy.new("https://youtube.com/watch?v=" + id)
+        if VIDEO:
+            target = video.getbest()
+        else:
+            target = video.getbestaudio()
+        url_cache[id] = target.url
+    return url_cache[id]
+
 def play(id, start_time=0):
     print("play requested for {}, starting at {}".format(id, start_time))
-
-    video = pafy.new("https://youtube.com/watch?v=" + id)
-    if VIDEO:
-    	target = video.getbest()
-    else:
-    	target = video.getbestaudio()
 
     args = ["-o", "both"] if VIDEO else ["-o", "local"]
     if start_time != 0:
@@ -41,7 +46,7 @@ def stop():
 
         tmp = player
         player = None
-        tmp.quit()
+        tmp.quit() # mark player as dead before we block on quitting it
 
 def stop_if_done():
     if player is None:
