@@ -1,6 +1,9 @@
 import pafy
 from omxplayer.player import OMXPlayer, OMXPlayerDeadError
+from interval import *
+import json
 
+STATUS_URL = "http://dabney.caltech.edu:27036/status"
 VIDEO = False # TODO: auto-detect if an HDMI is plugged in
 
 player = None
@@ -16,6 +19,16 @@ def get_player_url(id):
             target = video.getbestaudio()
         url_cache[id] = target.url
     return url_cache[id]
+
+def prep_queue():
+    f = urllib.request.urlopen(STATUS_URL)
+    data = json.load(f)
+    to_download = set(data["queue"])
+    if data.get("current") is not None:
+        to_download.add(data["current"])
+    for id in to_download:
+        get_player_url(id): # ensure we have a player url for everybody in the queue
+set_interval(prep_queue, 10)
 
 def play(id, start_time=0):
     print("play requested for {}, starting at {}".format(id, start_time))
