@@ -16,6 +16,14 @@ def play(id, start_time=0):
     	target = video.getbestaudio()
 
     args = ["-o", "both"] if VIDEO else ["-o", "local"]
+    if start_time != 0:
+        seconds = start_time
+        hours = seconds // 3600
+        seconds -= 3600 * hours
+        minutes = seconds // 60
+        seconds -= 60 * minutes
+        timestamp = "{}:{}:{}".format(hours, minutes, seconds)
+        args += ["--pos", timestamp]
 
     global player
     if player is None:
