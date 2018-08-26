@@ -18,7 +18,7 @@ def play(id, start_time=0):
     args = ["-o", "both"] if VIDEO else ["-o", "local"]
 
     global player
-    if player is not None:
+    if player is None:
         player = OMXPlayer(target.url, args=args)
 
 def stop():
@@ -30,7 +30,7 @@ def stop():
             stop_time = player.position()
         except omxplayer.player.OMXPlayerDeadError:
             stop_time = 0
-        
+
         player.quit()
         player = None
 
