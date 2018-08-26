@@ -1,5 +1,5 @@
 import pafy
-from omxplayer.player import OMXPlayer
+from omxplayer.player import OMXPlayer, OMXPlayerDeadError
 
 VIDEO = False # TODO: auto-detect if an HDMI is plugged in
 
@@ -36,7 +36,7 @@ def stop():
     if player is not None:
         try:
             stop_time = player.position()
-        except omxplayer.player.OMXPlayerDeadError:
+        except OMXPlayerDeadError:
             stop_time = 0
 
         player.quit()
