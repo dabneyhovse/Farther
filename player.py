@@ -4,6 +4,7 @@ from omxplayer.player import OMXPlayer
 VIDEO = False # TODO: auto-detect if an HDMI is plugged in
 
 player = None
+stop_time = 0
 
 def play(id, start_time=0):
     print("play requested for {}, starting at {}".format(id, start_time))
@@ -22,8 +23,14 @@ def play(id, start_time=0):
 
 def stop():
     global player
+    global stop_time
 
     if player is not None:
+        try:
+            stop_time = player.position()
+        except omxplayer.player.OMXPlayerDeadError:
+            stop_time = 0
+        
         player.quit()
         player = None
 
@@ -39,6 +46,6 @@ def stop_if_done():
 
 def get_time():
     if player is None:
-        return 0
+        return stop_time
     else:
         return player.position()
