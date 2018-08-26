@@ -39,13 +39,14 @@ def stop():
         except OMXPlayerDeadError:
             stop_time = 0
 
-        player.quit()
+        tmp = player
         player = None
+        tmp.quit()
 
 def stop_if_done():
-    if player is None or player._process is None:
+    if player is None:
         return False
-    elif player._process.poll() is not None:
+    elif player._process is None or player._process.poll() is not None:
         # TODO: this seems to be the how OMXPlayer internally detects whether a
         # player is done, but a try-catech may work better
         stop()
