@@ -8,8 +8,8 @@ STATUS_URL = "http://dabney.caltech.edu:27036/status"
 VIDEO = False # TODO: auto-detect if an HDMI is plugged in
 
 player = None
-start_time = None
-stop_time = 0
+player_start_time = None
+player_stop_time = 0
 
 url_cache = {}
 def get_player_url(id):
@@ -46,20 +46,21 @@ def play(id, start_time=0):
         args += ["--pos", timestamp]
 
     global player
+    global player_start_time
     if player is None:
         player = OMXPlayer(play_url, args=args)
-        start_time = time.time()
+        player_start_time = time.time() - start_time
         print("Started OMXPlayer for {} at {}".format(id, start_time))
 
 def stop():
     global player
-    global stop_time
+    global player_stop_time
 
     if player is not None:
         try:
-            stop_time = get_time()
+            player_stop_time = get_time()
         except OMXPlayerDeadError:
-            stop_time = 0
+            player_stop_time = 0
 
         tmp = player
         player = None
@@ -77,6 +78,6 @@ def stop_if_done():
 
 def get_time():
     if player is None:
-        return stop_time
+        return player_stop_time
     else:
-        return time.time() - start_time
+        return time.time() - player_start_time
