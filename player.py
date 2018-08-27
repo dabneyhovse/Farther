@@ -2,12 +2,13 @@ import pafy
 from omxplayer.player import OMXPlayer, OMXPlayerDeadError
 from interval import *
 import requests
-
+import time
 
 STATUS_URL = "http://dabney.caltech.edu:27036/status"
 VIDEO = False # TODO: auto-detect if an HDMI is plugged in
 
 player = None
+start_time = None
 stop_time = 0
 
 url_cache = {}
@@ -47,6 +48,7 @@ def play(id, start_time=0):
     global player
     if player is None:
         player = OMXPlayer(play_url, args=args)
+        start_time = time.time()
         print("Started OMXPlayer for {} at {}".format(id, start_time))
 
 def stop():
@@ -55,7 +57,7 @@ def stop():
 
     if player is not None:
         try:
-            stop_time = player.position()
+            stop_time = get_time()
         except OMXPlayerDeadError:
             stop_time = 0
 
@@ -77,4 +79,4 @@ def get_time():
     if player is None:
         return stop_time
     else:
-        return player.position()
+        return time.time() - start_time
