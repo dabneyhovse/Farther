@@ -81,3 +81,5 @@ def get_time():
         return player_stop_time
     else:
         return time.time() - player_start_time
+        # TODO: using player.position() seems cleaner but resulted in resumes
+        # ~10 seconds off from the pauses
