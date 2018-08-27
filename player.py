@@ -32,8 +32,6 @@ def prep_queue():
 set_interval(prep_queue, 10)
 
 def play(id, start_time=0):
-    print("play requested for {}, starting at {}".format(id, start_time))
-
     play_url = get_player_url(id)
 
     args = ["-o", "both"] if VIDEO else ["-o", "local"]
@@ -49,6 +47,7 @@ def play(id, start_time=0):
     global player
     if player is None:
         player = OMXPlayer(play_url, args=args)
+        print("Started OMXPlayer for {} at {}".format(id, start_time))
 
 def stop():
     global player
