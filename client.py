@@ -54,6 +54,7 @@ def connect_augment(f):
     return callback
 
 def on_disconnect():
+    global connected
     connected = False
     print('disconnected')
 
