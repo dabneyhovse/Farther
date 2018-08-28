@@ -5,22 +5,6 @@ from time import time
 from interval import *
 import player
 
-# import logging
-# logging.getLogger('socketIO-client').setLevel(logging.DEBUG)
-# logging.basicConfig()
-
-def on_connect():
-    print('connected to server')
-
-def on_disconnect():
-    print('disconnected')
-
-def on_reconnect():
-    print('reconnected')
-
-def on_confirm_connect():
-    print('server confirmed connection')
-
 def on_status(status):
     print('status:', status)
 
@@ -59,15 +43,26 @@ def check_done(*args):
         socket.emit("done")
 set_interval(check_done, 1)
 
+connected = False
+def connect_augment(f):
+    def callback(*args, **kwargs):
+        global connected
+        if not connected:
+            print('connected to server')
+            connected = True
+        f(*args, **kwargs)
+    return callback
+
+def on_disconnect():
+    connected = False
+    print('disconnected')
+
 socket = SocketIO('dabney.caltech.edu', 27036)
-socket.on('connect', on_connect)
 socket.on('disconnect', on_disconnect)
-socket.on('reconnect', on_reconnect)
-socket.on('server_connect', on_confirm_connect)
-socket.on('status', on_status)
-socket.on('sv_pong', pong)
-socket.on('play', on_play)
-socket.on('pause', on_pause)
-socket.on('skip', on_skip)
+socket.on('status', connect_augment(on_status))
+socket.on('sv_pong', connect_augment(pong))
+socket.on('play', connect_augment(on_play))
+socket.on('pause', connect_augment(on_pause))
+socket.on('skip', connect_augment(on_skip))
 
 socket.wait()
