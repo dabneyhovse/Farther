@@ -43,6 +43,9 @@ def check_done(*args):
         socket.emit("done")
 set_interval(check_done, 1)
 
+# The socket.on('connect') and .on('reconnect') handlers didn't work
+# so this wraps all server-signal-handling methods in code to make sure
+# we know that we're connected
 connected = False
 def connect_augment(f):
     def callback(*args, **kwargs):
@@ -52,7 +55,6 @@ def connect_augment(f):
             connected = True
         f(*args, **kwargs)
     return callback
-
 def on_disconnect():
     global connected
     connected = False
