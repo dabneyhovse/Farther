@@ -120,7 +120,7 @@ def paused(timestamp):
     global playtime
     try:
         playtime = int(timestamp)
-    except ValueError, TypeError:
+    except (ValueError, TypeError):
         playtime = 0
         print('Invalid timestamp', timestamp)
     socketio.emit('status', getStatus())
