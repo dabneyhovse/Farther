@@ -197,6 +197,10 @@
                     <label class="col-sm-4 col-xs-12" for="user">Whomst are you?</label>
                     <input class="col-sm-8 col-xs-12" type="text" id="user" name="user" />
                 </div>
+		<div class="row"><div style="text-align: center;" class="col-xs-12">
+		if u use a fake name andrea will beat u up
+		</div></div>
+
                 <div class="row">
                     <label class="col-sm-4 col-xs-12" for="url">YouTube URL</label>
                     <input class="col-sm-8 col-xs-12" type="text" id="url" name="url" />
