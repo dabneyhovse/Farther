@@ -198,7 +198,7 @@
                     <input class="col-sm-8 col-xs-12" type="text" id="user" name="user" />
                 </div>
 		<div class="row"><div style="text-align: center;" class="col-xs-12">
-		if u use a fake name andrea will beat u up
+		If you use a fake name, some linear combination of Andrea, Amrita, and Cayla will beat you up
 		</div></div>
 
                 <div class="row">
