@@ -74,7 +74,7 @@
         });
     }
     function get_req(action) {
-        fetch(`https://dabney.caltech.edu/farther/process.php?action=${action}`).then(update());
+        fetch(`/farther/process.php?action=${action}`).then(update());
     }
 
     let lock = false;
