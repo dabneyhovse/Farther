@@ -139,7 +139,15 @@ if (array_key_exists('url', $_POST)) { // Add song to queue.
     $data = get_vid_data($vid_id);
 
     // Simple Ride filter.
-    if (strpos(strtolower($data->title), 'valkyries') === false) {
+    $ride = false;
+    foreach (array('valkyries', 'beep beep lettuce', 'ROTV') as $keyword) {
+        $ride = $ride || strpos(strtolower($data->title), $keyword);
+    }
+
+    if ($ride) {
+        $code = 401; // You can't just play the ride!
+        $message = 'Ride detected. Nice try, punk.';
+    } else {
         // Get the POST data.
         if (add_vid_to_queue($_POST['url'])) {
             // Record in the database.
@@ -149,9 +157,6 @@ if (array_key_exists('url', $_POST)) { // Add song to queue.
             $code = 500; // Server error.
             $message = 'Failed to add video to queue.';
         }
-    } else {
-      $code = 401; // You can't just play the ride!
-      $message = 'Ride detected. Nice try, punk.';
     }
 }
 
