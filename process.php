@@ -141,7 +141,7 @@ if (array_key_exists('url', $_POST)) { // Add song to queue.
     // Simple Ride filter.
     $ride = false;
     foreach (array('valkyries', 'beep beep lettuce', 'ROTV') as $keyword) {
-        $ride = $ride || strpos(strtolower($data->title), $keyword);
+        $ride = $ride || (strpos(strtolower($data->title), $keyword) !== false);
     }
 
     if ($ride) {
