@@ -60,7 +60,14 @@ function add_vid_to_queue($data) {
     global $PYTHON_SERVER;
 
     $vid_id = extract_vid_id($data);
-    $response = call_get_api($PYTHON_SERVER . "add", array("vid" => $vid_id));
+    $response = call_get_api(
+	    $PYTHON_SERVER . "add",
+	    array(
+		    "vid" => $vid_id,
+		    "user" => $_SERVER['PHP_AUTH_USER'],
+		    "note" => $_POST['note']
+	    )
+    );
 
     return array_key_exists('message', $response) &&
            $response['message'] === 'Success!';
@@ -84,50 +91,23 @@ function queue_control($control) {
     }
 }
 
-$create = !file_exists('farther.db');
-$pdo = new PDO('sqlite:farther.db');
+function vid_data($vid_id) {
+    $url = 'http://www.youtube.com/watch?v=' . $vid_id;
+    $curr_data = get_vid_data($vid_id);
+    $title = htmlentities($curr_data->title, null, 'UTF-8');
+    $author_name = htmlentities($curr_data->author_name, null, 'UTF-8');
+    $author_url = htmlentities($curr_data->author_url, null, 'UTF-8');
+    $thumbnail = htmlentities($curr_data->thumbnail_url, null, 'UTF-8');
 
-function nearer_record($v, $note) {
-    global $pdo;
-    global $create;
-
-    if ($create) {
-        $pdo->exec(
-<<<EOF
-CREATE TABLE `history` (
-  `user` varchar(64) NOT NULL,
-  `v` varchar(16) NOT NULL,
-  `created` datetime NOT NULL,
-  `note` varchar(255) NULL
-)
-EOF
-        );
-    }
-
-    $result = $pdo->prepare(
-<<<EOF
-INSERT INTO `history` (
-  `user`,
-  `v`,
-  `created`,
-  `note`
-)
-VALUES (
-  :user,
-  :v,
-  DATETIME('now'),
-  :note
-)
-EOF
+    $vid_data = array(
+        'url' => $url,
+        'title' => $title,
+        'author_name' => $author_name,
+        'author_url' => $author_url,
+        'thumbnail' => $thumbnail
     );
-
-    $result->execute(array(
-        ':user' => $_POST['user'],
-        ':v' => $v,
-        ':note' => $note
-    ));
+    return $vid_data;
 }
-
 
 if (array_key_exists('action', $_GET)) { // Queue control action.
     queue_control($_GET['action']);
@@ -150,8 +130,6 @@ if (array_key_exists('url', $_POST)) { // Add song to queue.
     } else {
         // Get the POST data.
         if (add_vid_to_queue($_POST['url'])) {
-            // Record in the database.
-            nearer_record('PLAY ' . $vid_id, substr($_POST['note'], 0, 255));
             $message = 'Successfully added video to queue.';
         } else {
             $code = 500; // Server error.
@@ -161,70 +139,23 @@ if (array_key_exists('url', $_POST)) { // Add song to queue.
 }
 
 if (array_key_exists('status', $_GET)) {
-    $result = $pdo->prepare(
-<<<EOF
-SELECT *
-FROM `history`
-WHERE `v` LIKE 'PLAY %'
-ORDER BY `created` DESC
-LIMIT 20
-EOF
-      );
-
-    $result->execute();
-
+    $history = array();
+    $queue = array();
     $songs = array();
-    $i = 0;
-
-    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-        $vid = substr($row['v'], 5);
-        $url = 'http://www.youtube.com/watch?v=' . $vid;
-        $data = get_vid_data($vid);
-        $title = htmlentities($data->title, null, 'UTF-8');
-        $author_name = htmlentities($data->author_name, null, 'UTF-8');
-        $author_url = htmlentities($data->author_url, null, 'UTF-8');
-        $thumbnail = htmlentities($data->thumbnail_url, null, 'UTF-8');
-        $note = htmlentities($row['note'], null, 'UTF-8');
-
-        $upload_time = new DateTime($row['created'], new DateTimeZone("UTC"));
-        $upload_time->setTimezone(new DateTimeZone('America/Los_Angeles'));
-
-	$song = array(
-            'url' => $url,
-            'title' => $title,
-            'author_name' => $author_name,
-            'author_url' => $author_url,
-            'thumbnail' => $thumbnail,
-            'note' => $note,
-            'added_by' => $row['user'],
-            'added_on' => $upload_time->format('Y-m-d g:i:sa')
-        );
-        $songs[$i++] = $song;
-    }
 
     $data = call_get_api($PYTHON_SERVER . 'status');
     unset($data['queue']);
     //unset($data['status']);
 
     if ($data['current'] != null) {
-	$url = 'http://www.youtube.com/watch?v=' . $data['current'];
-	$curr_data = get_vid_data($data['current']);
-	$title = htmlentities($curr_data->title, null, 'UTF-8');
-	$author_name = htmlentities($curr_data->author_name, null, 'UTF-8');
-	$author_url = htmlentities($curr_data->author_url, null, 'UTF-8');
-	$thumbnail = htmlentities($curr_data->thumbnail_url, null, 'UTF-8');
+        $current = vid_data($data['current']['vid']);
+        $current['note'] = $data['current']['note'];
+        $current['added_by'] = $data['current']['user'];
+        $current['added_on'] = $data['current']['time'];
 
-	$current = array(
-	'url' => $url,
-	'title' => $title,
-	'author_name' => $author_name,
-	'author_url' => $author_url,
-	'thumbnail' => $thumbnail
-	);
-	$data['current'] = $current;
+        $data['current'] = $current;
+        array_push($songs, $current);
     }
-
-    $data['songs'] = $songs;
 
     echo json_encode($data);
 } else {

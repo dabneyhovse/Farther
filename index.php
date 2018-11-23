@@ -33,11 +33,47 @@
         </div>
     </div>
     <script>
-    function update() {
+    let API_KEY = 'AIzaSyCR-P0eRzSQ6HWfUyKsSzPcoESNElF1ZFU';
+    async function get_video_data(ids) {
+        if (ids == null) {
+            return null;
+        }
+
+        let id_list = ids.join(',');
+
+        let res = await fetch(`https://content.googleapis.com/youtube/v3/videos?id=${id_list}&part=snippet&key=${API_KEY}`);
+        let json = await res.json();
+        let videos = json.items.map(
+        item => {
+            return {
+                author_name: item.snippet.channelTitle,
+                author_url: `https://youtube.com/channel/${item.snippet.channelId}`,
+                title: item.snippet.title,
+                thumbnail: item.snippet.thumbnails.medium.url,
+                url: `https://youtu.be/${item.id}`
+            }
+        });
+        return videos;
+    }
+    async function update() {
         console.log('updating...');
-        fetch('process.php?status').then(res => res.json()).then(data => {
-            let song_div_inner = '';
-            data.songs.forEach((song) => {
+        let data = await fetch('process.php?status');
+        let song_div_inner = '';
+
+        let songs = [];
+        if (data.history) {
+            let song_data = await get_video_data(data.history.map(x => x != null ? x.vid : null));
+            songs = songs.concat(data.history.map((song, i) => song == null ? null : Object.assign({ note: song.note, added_by: song.user, added_on: song.time }, song_data[i])));
+        }
+        if (data.current) songs.push(data.current);
+        if (data.queue) {
+            let song_data = await get_video_data(data.queue.map(x => x.vid));
+            songs = songs.concat(data.queue.map((song, i) => song == null ? null : Object.assign({ note: song.note, added_by: song.user, added_on: song.time }, song_data[i])));
+        }
+        songs.reverse();
+
+        songs.forEach((song) => {
+            if (song != null) {
                 let song_element = `<div class="row vid-listed">
                     <img src="${song.thumbnail}" class="col-md-3 col-sm-5 col-xs-12" />
                     <div class="col-md-9 col-sm-7 col-xs-12">
@@ -50,28 +86,32 @@
                     </div>
                 </div>`;
                 song_div_inner += song_element;
-            });
-            document.getElementById('recently_added').innerHTML = song_div_inner;
-
-            if (data.client_connected) {
-                $('#client_status').html(`<h3 class='alert alert-success'>Client connected and ${data.status}</h3>`);
-            } else {
-                $('#client_status').html("<h3 class='alert alert-danger'>Client disconnected.</h3>");
-            }
-
-            if (data.current) {
-    	        document.getElementById('playing_now').innerHTML = `\
-                    <img src="${data.current.thumbnail}" class="col-md-3 col-sm-5 col-xs-12" />
-                    <div class="col-md-9 col-sm-7 col-xs-12">
-                        <h4>
-                            <a href="${data.current.url}">${data.current.title}</a>
-                        </h4>
-        	            <p>Uploaded by <a href="${data.current.author_url}">${data.current.author_name}</a></p>
-                    </div>`;
-    	    } else {
-                document.getElementById('playing_now').innerHTML = `<div class="alert alert-info"><h3>No Song Playing.</h3></div>`;
             }
         });
+        document.getElementById('recently_added').innerHTML = song_div_inner;
+
+        if (data.client_connected) {
+            $('#client_status').html(`<h3 class='alert alert-success'>Client connected and ${data.status}</h3>`);
+        } else {
+            $('#client_status').html("<h3 class='alert alert-danger'>Client disconnected.</h3>");
+        }
+        // TODO: better status messages?
+
+        if (data.current) {
+            let song = data.current;
+	        document.getElementById('playing_now').innerHTML = `\
+                <img src="${song.thumbnail}" class="col-md-3 col-sm-5 col-xs-12" />
+                <div class="col-md-9 col-sm-7 col-xs-12">
+                    <h4>
+                        <a href="${song.url}">${song.title}</a>
+                    </h4>
+    	            <p>Uploaded by <a href="${song.author_url}">${data.current.author_name}</a></p>
+                    <p>Added by ${song.added_by} on ${song.added_on}</p>
+                    <p>${song.note}</p>
+                </div>`;
+	    } else {
+            document.getElementById('playing_now').innerHTML = `<div class="alert alert-info"><h3>No Song Playing.</h3></div>`;
+        }
     }
     function get_req(action) {
         fetch(`/farther/process.php?action=${action}`).then(update());
@@ -198,7 +238,7 @@
                     <input class="col-sm-8 col-xs-12" type="text" id="user" name="user" />
                 </div>
 		<div class="row"><div style="text-align: center;" class="col-xs-12">
-		If you use a fake name, some linear combination of Andrea, Amrita, and Cayla will beat you up
+		If you use a fake name, some linear combination of Andrea, Amrita, Cayla, and Harel will beat you up
 		</div></div>
 
                 <div class="row">
@@ -238,11 +278,11 @@
 
             </div>
 
-            <div id="shortcutButtons" class="row">
+            <!-- <div id="shortcutButtons" class="row">
                 <button class="submitShortcut btn btn-primary col-md-4 col-md-offset-4 col-sm-8 col-sm-offset-2 col-xs-12" data-ytid="kJQP7kiw5Fk">
                     This is so sad. Farther, play <i>Despacito</i>.
                 </button>
-            </div>
+            </div> -->
 
             <script>
             $(function () {
@@ -268,7 +308,7 @@
 
             <p>
                 Copyright &copy; 2018 Nicholas Currault <br>
-                (partially derived from <a href="https://github.com/ejaszewski/nearer-client">Nearer</a>
+                (partially derived from <a href="https://github.com/ejaszewski/Nearer">Nearer</a>
                 under the MPL 2.0 license) <br>
                 A service of Dabney Hovse
             </p>
