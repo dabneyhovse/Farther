@@ -7,15 +7,14 @@ from functools import wraps
 from threading import Lock
 import json
 import re
+import os
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, async_mode=None)
 
 # Localhost Only
-def check_auth():
-    return True
-
 def local_only(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -26,7 +25,20 @@ def local_only(f):
 
 # Play Queue State Variables
 queue = Queue()
+try:
+    qd = open('queuedump.txt', 'r')
+    for song in qd.readlines():
+        queue.put(song.rstrip())
+    os.remove('queuedump.txt')
+except:
+    pass
+
+history = Queue()
+histlog = open('history.log', 'a')
+
 playing = None
+if not queue.empty():
+    playing = queue.get()
 running = True
 playtime = 0
 client_playing = False
@@ -50,9 +62,13 @@ def playNext():
     global playing
     global playtime
 
-    if running and not queue.empty():
+    if running and playing:
+        socketio.emit('status', getStatus())
+        emitPlay()
+
+        return True
+    elif running and not playing and not queue.empty():
         playing = queue.get(True)
-        print(playing)
         playtime = 0
 
         socketio.emit('status', getStatus())
@@ -67,7 +83,7 @@ def emitPlay(data=None):
     if data == None:
         global playing
         global playtime
-        data = dict({ 'video': playing, 'start': playtime })
+        data = dict({ 'video': playing['vid'], 'start': playtime })
     if data['video'] != None:
         print('Emitting play request:', data)
         socketio.emit('play', data)
@@ -83,6 +99,7 @@ def getStatus():
 
     return dict({
         'queue': list(queue.queue),
+        'history': list(history.queue),
         'current': playing,
         'status': status
     })
@@ -97,11 +114,22 @@ def queueStatus():
 @local_only
 def addToQueue():
     vid = request.args.get('vid', '')
+    user = request.args.get('user', '')
+    note = request.args.get('note', '')
     if vid == '':
         abort(400)
+    elif user == '':
+        abort(401)
     else:
-        queue.put(vid, True)
-        if queue.qsize() == 1 and playing == None:
+        data = {
+            'vid': vid,
+            'user': user,
+            'note': note,
+            'time': datetime.now().strftime('%a, %b %d %Y %H:%M:%S')
+        }
+        print({'action': 'play', **data}, file=histlog)
+        queue.put(data, True)
+        if playing == None:
             playNext()
         return json.dumps({ "message": "Success!", "queue": list(queue.queue)})
 
@@ -131,7 +159,7 @@ def resumeQueue():
     print('Resume requested.')
     if not running:
         running = True
-        emitPlay()
+        playNext()
     socketio.emit('status', getStatus())
 
     return json.dumps({ "message": "Success!", "queue": list(queue.queue)})
@@ -139,6 +167,13 @@ def resumeQueue():
 @app.route('/skip')
 def skip():
     print('Skip requested.')
+
+    user = request.args.get('user', '')
+    if user == '':
+        print({'action': 'skip', 'vid': playing['vid']}, file=histlog)
+    else:
+        print({'action': 'skip', 'user': user, 'vid': playing['vid']}, file=histlog)
+
     socketio.emit('skip')
     return json.dumps({ "message": "Success!", "queue": list(queue.queue)})
 
@@ -147,9 +182,12 @@ def done():
     print('Client done playing.')
     if running:
         global playing
+        history.put(playing)
+        if history.qsize() > 20:
+            history.get()
         playing = None
-    socketio.emit('status', getStatus())
     playNext()
+    socketio.emit('status', getStatus())
 
 @socketio.on('cl_ping')
 def pong():
@@ -161,6 +199,7 @@ def connection(msg):
 
 @socketio.on('connect')
 def connect():
+    # TODO require connections from client ip
     print('Client connected.')
     global client_connected
     client_connected = True
@@ -169,7 +208,7 @@ def connect():
     emit('status', getStatus())
 
     if playing or not queue.empty():
-        emitPlay()
+        playNext()
 
 @socketio.on('disconnect')
 def disconnect():
