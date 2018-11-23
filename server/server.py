@@ -200,7 +200,7 @@ def connection(msg):
 @socketio.on('connect')
 def connect():
     # TODO require connections from client ip
-    print('Client connected.')
+    #print('Client connected.')
     global client_connected
     client_connected = True
 
@@ -212,7 +212,7 @@ def connect():
 
 @socketio.on('disconnect')
 def disconnect():
-    print('Client disconnected.')
+    #print('Client disconnected.')
     global client_connected
     client_connected = False
 
