@@ -56,43 +56,45 @@
         });
         return videos;
     }
+    function format_song_elem(song) {
+        return `<div class="row vid-listed">
+            <img src="${song.thumbnail}" class="col-md-3 col-sm-5 col-xs-12" />
+            <div class="col-md-9 col-sm-7 col-xs-12">
+                <h4>
+                    <a href="${song.url}">${song.title}</a>
+                </h4>
+                <p>Uploaded by <a href="${song.author_url}">${song.author_name}</a></p>
+                <p>Added by ${song.added_by} on ${song.added_on}</p>
+                <p>${song.note}</p>
+            </div>
+        </div>`
+    }
+
     async function update() {
         console.log('updating...');
         let response = await fetch('process.php?status');
         let data = await response.json();
 
-        let song_div_inner = '';
+        let queue_div_inner = '';
+        let history_div_inner = '';
 
         let songs = [];
         if (data.history && data.history.length > 0) {
             let song_data = await get_video_data(data.history.map(x => x != null ? x.vid : null));
-            songs = songs.concat(data.history.map((song, i) => song == null ? null : Object.assign({ note: song.note, added_by: song.user, added_on: song.time }, song_data[i])));
+            data.history.map((song, i) => song == null ? null : Object.assign({ note: song.note, added_by: song.user, added_on: song.time }, song_data[i]))
+                .map((song) => { history_div_inner += format_song_elem(song); });
         }
-        if (data.current) songs.push(data.current);
 
         if (data.queue && data.queue.length > 0) {
             let song_data = await get_video_data(data.queue.map(x => x.vid));
-            songs = songs.concat(data.queue.map((song, i) => song == null ? null : Object.assign({ note: song.note, added_by: song.user, added_on: song.time }, song_data[i])));
+            data.queue.map((song, i) => song == null ? null : Object.assign({ note: song.note, added_by: song.user, added_on: song.time }, song_data[i]))
+                .map((song) => { queue_div_inner += format_song_elem(song); })
+            ;
         }
-        songs.reverse();
 
-        songs.forEach((song) => {
-            if (song != null) {
-                let song_element = `<div class="row vid-listed">
-                    <img src="${song.thumbnail}" class="col-md-3 col-sm-5 col-xs-12" />
-                    <div class="col-md-9 col-sm-7 col-xs-12">
-                        <h4>
-                            <a href="${song.url}">${song.title}</a>
-                        </h4>
-                        <p>Uploaded by <a href="${song.author_url}">${song.author_name}</a></p>
-                        <p>Added by ${song.added_by} on ${song.added_on}</p>
-                        <p>${song.note}</p>
-                    </div>
-                </div>`;
-                song_div_inner += song_element;
-            }
-        });
-        document.getElementById('recently_added').innerHTML = song_div_inner;
+        document.getElementById('queue_list').innerHTML = queue_div_inner;
+        document.getElementById('history_list').innerHTML = history_div_inner;
+
 
         if (data.client_connected) {
             $('#client_status').html(`<h3 class='alert alert-success'>Client connected and ${data.status}</h3>`);
@@ -102,23 +104,13 @@
         // TODO: better status messages?
 
         if (data.current) {
-            let song = data.current;
-	        document.getElementById('playing_now').innerHTML = `\
-                <img src="${song.thumbnail}" class="col-md-3 col-sm-5 col-xs-12" />
-                <div class="col-md-9 col-sm-7 col-xs-12">
-                    <h4>
-                        <a href="${song.url}">${song.title}</a>
-                    </h4>
-    	            <p>Uploaded by <a href="${song.author_url}">${data.current.author_name}</a></p>
-                    <p>Added by ${song.added_by} on ${song.added_on}</p>
-                    <p>${song.note}</p>
-                </div>`;
+	        document.getElementById('playing_now').innerHTML = format_song_elem(data.current);
 	    } else {
             document.getElementById('playing_now').innerHTML = `<div class="alert alert-info"><h3>No Song Playing.</h3></div>`;
         }
     }
     function get_req(action) {
-        fetch(`/farther/process.php?action=${action}`).then(update());
+        fetch(`process.php?action=${action}`).then(update());
     }
 
     let lock = false;
@@ -168,6 +160,7 @@
                         $('#error_code').text(res.status);
                         $('#failure_div').css('display', '');
                         setTimeout(() => { $('#failure_div').css('display', 'none') }, 5000);
+                        res.json().then((resp) => {$("#error_message").text(resp.message);});
                     }
                 });
             }
@@ -229,7 +222,7 @@
                     Success! Song added to queue.
                 </div>
                 <div id="failure_div" class="alert alert-danger col-xs-12" style="display: none">
-                    Error! Song not added to queue. Error code: <a id="error_code"></a>
+                    Error! Song not added to queue. Error <a id="error_code"></a>: <span id="error_message"></span>
                 </div>
                 <div id="js_error_div" class="alert alert-danger col-xs-12" style="display: none">
 
@@ -276,9 +269,16 @@
             </div>
 
             <div class="row section-header">
-                <h2>Recently Added</h2>
+                <h2>Queue</h2>
             </div>
-            <div id="recently_added" class="row">
+            <div id="queue_list" class="row">
+
+            </div>
+
+            <div class="row section-header">
+                <h2>History</h2>
+            </div>
+            <div id="history_list" class="row">
 
             </div>
 
