@@ -144,7 +144,7 @@ if (array_key_exists('status', $_GET)) {
     $songs = array();
 
     $data = call_get_api($PYTHON_SERVER . 'status');
-    unset($data['queue']);
+    //unset($data['queue']);
     //unset($data['status']);
 
     if ($data['current'] != null) {

@@ -42,7 +42,8 @@
         let id_list = ids.join(',');
 
         let res = await fetch(`https://content.googleapis.com/youtube/v3/videos?id=${id_list}&part=snippet&key=${API_KEY}`);
-        let json = await res.json();
+        let json = await res.json()
+
         let videos = json.items.map(
         item => {
             return {
@@ -57,16 +58,19 @@
     }
     async function update() {
         console.log('updating...');
-        let data = await fetch('process.php?status');
+        let response = await fetch('process.php?status');
+        let data = await response.json();
+
         let song_div_inner = '';
 
         let songs = [];
-        if (data.history) {
+        if (data.history && data.history.length > 0) {
             let song_data = await get_video_data(data.history.map(x => x != null ? x.vid : null));
             songs = songs.concat(data.history.map((song, i) => song == null ? null : Object.assign({ note: song.note, added_by: song.user, added_on: song.time }, song_data[i])));
         }
         if (data.current) songs.push(data.current);
-        if (data.queue) {
+
+        if (data.queue && data.queue.length > 0) {
             let song_data = await get_video_data(data.queue.map(x => x.vid));
             songs = songs.concat(data.queue.map((song, i) => song == null ? null : Object.assign({ note: song.note, added_by: song.user, added_on: song.time }, song_data[i])));
         }
