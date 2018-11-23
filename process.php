@@ -64,7 +64,7 @@ function add_vid_to_queue($data) {
 	    $PYTHON_SERVER . "add",
 	    array(
 		    "vid" => $vid_id,
-		    "user" => $_SERVER['PHP_AUTH_USER'],
+		    "user" => $_POST['user'],
 		    "note" => $_POST['note']
 	    )
     );
