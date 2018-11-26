@@ -135,7 +135,7 @@ if (array_key_exists('url', $_POST)) { // Add song to queue.
         $message = 'Ride detected. Nice try, punk.';
     } else if (in_array($_POST['user'], $BANNED_USERNAMES)) {
         $code = 401;
-        $message = 'Use your real name please.'
+        $message = 'Use your real name please.';
     } else {
         // Get the POST data.
         if (add_vid_to_queue($_POST['url'])) {
