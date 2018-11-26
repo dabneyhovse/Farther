@@ -118,15 +118,24 @@ if (array_key_exists('url', $_POST)) { // Add song to queue.
     $vid_id = extract_vid_id($_POST['url']);
     $data = get_vid_data($vid_id);
 
+    $RIDE_KEYWORDS = array('valkyries', 'beep beep lettuce', 'ROTV');
+    $BANNED_USERNAMES = array('');
+
     // Simple Ride filter.
     $ride = false;
-    foreach (array('valkyries', 'beep beep lettuce', 'ROTV') as $keyword) {
-        $ride = $ride || (strpos(strtolower($data->title), $keyword) !== false);
+    foreach ($RIDE_KEYWORDS as $keyword) {
+        if (strpos(strtolower($data->title), $keyword) !== false) {
+            $ride = true;
+            break;
+        }
     }
 
     if ($ride) {
-        $code = 401; // You can't just play the ride!
+        $code = 403; // You can't just play the ride!
         $message = 'Ride detected. Nice try, punk.';
+    } else if (in_array($_POST['user'], $BANNED_USERNAMES)) {
+        $code = 401;
+        $message = 'Use your real name please.'
     } else {
         // Get the POST data.
         if (add_vid_to_queue($_POST['url'])) {
