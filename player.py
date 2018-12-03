@@ -27,7 +27,7 @@ def prep_queue():
     data = f.json()
     to_download = set(data["queue"])
     if data.get("current") is not None:
-        to_download.add(data["current"])
+        to_download.add(data["current"]["vid"])
     for id in to_download:
         get_player_url(id) # ensure we have a player url for everybody in the queue
 set_interval(prep_queue, 10)
