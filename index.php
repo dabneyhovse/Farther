@@ -59,7 +59,7 @@
     function format_song_elem(song) {
         if (song == null)
             return "";
-        
+
         return `<div class="row vid-listed">
             <img src="${song.thumbnail}" class="col-md-3 col-sm-5 col-xs-12" />
             <div class="col-md-9 col-sm-7 col-xs-12">
@@ -75,9 +75,8 @@
 
     async function update() {
         console.log('updating...');
-        //let response = await fetch('process.php?status');
-        let response = `{"queue": [{"vid": "6hURqvyTBvA", "user": "NJ", "note": "Hope finals are going well", "time": "Tue, Dec 11 2018 22:13:36"}, {"vid": "h94GMUQ0DIY", "user": "pirate", "note": "", "time": "Tue, Dec 11 2018 22:13:37"}, {"vid": "QuFTCirwmoM", "user": "pirate", "note": "", "time": "Tue, Dec 11 2018 22:15:34"}, {"vid": "fU1FpICULHY", "user": " ", "note": "", "time": "Wed, Dec 12 2018 16:01:37"}, {"vid": "CLdeykXCZX4", "user": "aj", "note": "", "time": "Fri, Dec 14 2018 19:22:06"}, {"vid": "7I5HTF01ZNg", "user": "Chips", "note": "", "time": "Mon, Dec 17 2018 11:57:38"}, {"vid": "lZOyh_OS_aw", "user": "G Snow", "note": "", "time": "Sat, Jan 05 2019 20:19:13"}, {"vid": "gvjOG5gboFU", "user": "Will Xu", "note": "", "time": "Sun, Jan 06 2019 16:37:21"}], "history": [{"vid": "_Yhyp-_hX2s", "user": "festive", "note": "", "time": "Sun, Dec 09 2018 21:31:49"}, {"vid": "zKdwTgrow3E", "user": "yoted", "note": "", "time": "Sun, Dec 09 2018 21:35:00"}, {"vid": "TZv71qYVoJM", "user": "yoted", "note": "", "time": "Sun, Dec 09 2018 21:35:21"}, {"vid": "5AANP4qDLVM", "user": "yoted", "note": "", "time": "Sun, Dec 09 2018 21:36:00"}, {"vid": "fgtxb9yBggc", "user": "yoted", "note": "", "time": "Sun, Dec 09 2018 21:39:56"}, {"vid": "SKsOr9YdiXM", "user": " kat", "note": "", "time": "Sun, Dec 09 2018 21:42:15"}, null, null, null, null, null, null, null, null, null, null, null, null, {"vid": "wS4eWc_8qDU", "user": "NJ", "note": "", "time": "Mon, Dec 10 2018 12:30:08"}, {"vid": "1vrEljMfXYo", "user": "NJ", "note": "", "time": "Mon, Dec 10 2018 14:57:09"}], "current": {"vid": "wcehaxidJZk", "user": "NJ", "note": "I\u2019m sorry", "time": "Mon, Dec 10 2018 22:47:40"}, "status": "Paused", "client_connected": true}`;
-        let data = JSON.parse(response);
+        let response = await fetch('process.php?status');
+        let data = await response.json();
 
         let queue_div_inner = '';
         let history_div_inner = '';
