@@ -22,10 +22,11 @@ def get_player_url(id):
         url_cache[id] = target.url
     return url_cache[id]
 
+# reduce between-song latency by loading the player URL ahead of time
 def prep_queue():
     f = requests.get(STATUS_URL)
     data = f.json()
-    to_download = set(data["queue"])
+    to_download = { item["vid"] for item in data["queue"] }
     if data.get("current") is not None:
         to_download.add(data["current"]["vid"])
     for id in to_download:
