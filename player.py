@@ -154,7 +154,7 @@ class VideoData:
             self.unavailable = False
 
             streamable = list(filter(lambda s: s.extension == "webm", video.audiostreams))
-            if len(streamable) > 0:
+            if len(streamable) > 0 and self.duration[:4] != "00:0": # sketchy way of checking if >= 10 mins
                 self.url = streamable[0].url
                 self.streamable = True
                 self.ready_callback()
@@ -164,8 +164,9 @@ class VideoData:
                 dl_thread = YoutubeDownloader(self.id, self.download_callback)
                 dl_thread.start()
 
-        except (OSError, ValueError) as _:
+        except (OSError, ValueError) as e:
             self.unavailable = True
+            logging.info("%s unavailable because of error: %s", id, str(e))
             # indicates that video is UNAVAILABLE (premium only, copyright blocked, etc)
 
         VideoData.cache[id] = self
@@ -178,6 +179,9 @@ class VideoData:
         self.ready_callback()
 
     def set_ready_callback(self, new_callback):
+        if new_callback is None:
+            new_callback = lambda: None
+
         if self.streamable or self.downloaded:
             new_callback()
         self.ready_callback = new_callback
@@ -190,7 +194,7 @@ class VideoData:
         return \
             (id in VideoData.cache) and \
             (not VideoData.cache[id].unavailable) and \
-            (datetime.datetime.now() - VideoData.cache[id].last_updated > datetime.timedelta(hours=6))
+            (datetime.datetime.now() - VideoData.cache[id].last_updated < datetime.timedelta(hours=6))
 
     # reduce between-song latency by loading the player URL or downloading the video ahead of time
     @classmethod
@@ -199,21 +203,19 @@ class VideoData:
         data = f.json()
         to_download = { item["vid"] for item in data["queue"] }
 
-        for id in to_download:
+        for id in set(to_download):
             VideoData(id)
 
     def __init__(self, id, ready_callback=None):
         self.streamable = False
         self.downloaded = False
-        if ready_callback:
-            self.set_ready_callback(ready_callback)
-        else:
-            self.remove_ready_callback()
 
         if VideoData.cache_valid(id):
             self.__dict__.update(VideoData.cache[id].__dict__)
+            self.set_ready_callback(ready_callback)
             # copy from cached vid
         else:
+            self.set_ready_callback(ready_callback)
             self.load_data(id)
 
 
