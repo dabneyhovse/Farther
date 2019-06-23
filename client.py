@@ -5,6 +5,18 @@ from time import time
 from interval import *
 import player
 
+# The socket.on('connect') and .on('reconnect') handlers didn't work
+# so this wraps all server-signal-handling methods in code to make sure
+# we know that we're connected
+connected = False
+def indicates_connection(f):
+    def _decorator(*args, **kwargs):
+        global connected
+        if not connected:
+            connected = True
+        return f(*args, **kwargs)
+    return _decorator
+
 @indicates_connection
 def on_status(status):
     print('status:', status)
@@ -31,19 +43,6 @@ def on_skip(*args):
 
 def emit_done():
     socket.emit("done")
-
-# The socket.on('connect') and .on('reconnect') handlers didn't work
-# so this wraps all server-signal-handling methods in code to make sure
-# we know that we're connected
-connected = False
-def indicates_connection(f):
-    def _decorator(*args, **kwargs):
-        global connected
-        if not connected:
-            connection_status.config(text="☑", foreground="#00aa00")
-            connected = True
-        return f(*args, **kwargs)
-    return _decorator
 
 def on_disconnect():
     global connected
