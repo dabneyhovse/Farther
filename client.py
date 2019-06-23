@@ -11,6 +11,8 @@ logging.basicConfig(filename="/home/pi/farther.log", filemode='a',
     level=logging.INFO)
 logging.info("Farther client started")
 
+player.Player.set_volume(1) # volume control is on amp itself
+
 # The socket.on('connect') and .on('reconnect') handlers didn't work
 # so this wraps all server-signal-handling methods in code to make sure
 # we know that we're connected
