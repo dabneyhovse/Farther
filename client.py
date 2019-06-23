@@ -4,6 +4,7 @@ from socketIO_client import SocketIO
 from time import time
 from interval import *
 import player
+import logging
 
 logging.basicConfig(filename="/home/pi/farther.log", filemode='a',
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
