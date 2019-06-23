@@ -5,6 +5,11 @@ from time import time
 from interval import *
 import player
 
+logging.basicConfig(filename="/home/pi/farther.log", filemode='a',
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO)
+logging.info("Farther client started")
+
 # The socket.on('connect') and .on('reconnect') handlers didn't work
 # so this wraps all server-signal-handling methods in code to make sure
 # we know that we're connected
@@ -56,4 +61,5 @@ socket.on('play', on_play)
 socket.on('pause', on_pause)
 socket.on('skip', on_skip)
 
+logging.info("Handlers set up, SocketIO is now polling...")
 socket.wait()

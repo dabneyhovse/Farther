@@ -11,7 +11,7 @@ import logging
 import enum
 
 STATUS_URL = "http://dabney.caltech.edu:27036/status"
-DOWNLOAD_DIR = "~/farther_downloads/"
+DOWNLOAD_DIR = "/home/pi/farther_downloads/"
 
 # helper functions for volume, time
 def linear_to_mbels(val):
