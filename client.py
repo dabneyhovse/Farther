@@ -25,11 +25,11 @@ def indicates_connection(f):
 
 @indicates_connection
 def on_status(status):
-    print('status:', status)
+    logging.info('status:', status)
 
 @indicates_connection
 def on_play(req):
-    print("Play requested for {} at {}".format( req["video"], req["start"] ))
+    logging.info("Play requested for {} at {}".format( req["video"], req["start"] ))
     player.Player(req["video"], start_time=req["start"], done_callback=emit_done)
 
 @indicates_connection
@@ -53,7 +53,7 @@ def emit_done():
 def on_disconnect():
     global connected
     connected = False
-    print('disconnected')
+    logging.info('disconnected')
 
 socket = SocketIO('dabney.caltech.edu', 27036)
 socket.on('disconnect', on_disconnect)
