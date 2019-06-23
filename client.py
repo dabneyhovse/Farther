@@ -25,7 +25,7 @@ def indicates_connection(f):
 
 @indicates_connection
 def on_status(status):
-    logging.info('status:', status)
+    logging.info('status: %s', status)
 
 @indicates_connection
 def on_play(req):
