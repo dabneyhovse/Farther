@@ -15,6 +15,15 @@ $code = 200;
 $message = 'Success.';
 header('Content-Type: application/json');
 
+$userfile = file_get_contents("allowed_names.txt");
+$rows = explode("\n", $userfile);
+$usermap = array();
+foreach($rows as $data) {
+    //get row data
+    $row_data = explode('      ', $data);
+    $usermap[$row_data[0]] = $row_data[1];
+}
+
 // Method: POST, PUT, GET etc
 // Data: array("param" => "value") ==> index.php?param=value
 // Based on: https://stackoverflow.com/questions/9802788/
@@ -58,13 +67,14 @@ function get_vid_data($v) {
 
 function add_vid_to_queue($data) {
     global $PYTHON_SERVER;
+    global $usermap;
 
     $vid_id = extract_vid_id($data);
     $response = call_get_api(
 	    $PYTHON_SERVER . "add",
 	    array(
 		    "vid" => $vid_id,
-		    "user" => $_POST['user'],
+		    "user" => $usermap[$_POST['user']],
 		    "note" => $_POST['note']
 	    )
     );
@@ -74,6 +84,11 @@ function add_vid_to_queue($data) {
 }
 
 function queue_control($control) {
+    // TODO uncomment during interhouse
+    //$code = 401;
+    //$message = 'no controls during interhorse';
+    //return false;
+
     // Make the control lower case to avoid ambiguity.
     $control = strtolower($control);
     switch ($control) {
@@ -119,7 +134,6 @@ if (array_key_exists('url', $_POST)) { // Add song to queue.
     $data = get_vid_data($vid_id);
 
     $RIDE_KEYWORDS = array('valkyries', 'beep beep lettuce', 'ROTV');
-    $BANNED_USERNAMES = array('');
 
     // Simple Ride filter.
     $ride = false;
@@ -133,9 +147,9 @@ if (array_key_exists('url', $_POST)) { // Add song to queue.
     if ($ride) {
         $code = 403; // You can't just play the ride!
         $message = 'Ride detected. Nice try, punk.';
-    } else if (in_array($_POST['user'], $BANNED_USERNAMES)) {
+    } else if (! array_key_exists($_POST['user'], $usermap)) {
         $code = 401;
-        $message = 'Use your real name please.';
+        $message = 'User not found.';
     } else {
         // Get the POST data.
         if (add_vid_to_queue($_POST['url'])) {

@@ -234,11 +234,11 @@
 
             <span class="submit-form" aria-label="song submission">
                 <div class="row">
-                    <label class="col-sm-4 col-xs-12" for="user">Whomst are you?</label>
+                    <label class="col-sm-4 col-xs-12" for="user">Wiki username</label>
                     <input class="col-sm-8 col-xs-12" type="text" id="user" name="user" />
                 </div>
 		<div class="row"><div style="text-align: center;" class="col-xs-12">
-		If you use a fake name, some linear combination of Andrea, Amrita, Cayla, and Harel will beat you up
+		Actual password system in progress, plz be nice
 		</div></div>
 
                 <div class="row">
@@ -253,7 +253,7 @@
                     <button class="btn btn-primary col-sm-offset-4 col-sm-2 col-xs-12" onclick="submit_song();" class="control">Submit</button>
 
                     <div class="col-sm-offset-2 col-sm-4 col-xs-12">
-                        <div class="row controls" aria-label="player controls">
+                        <div class="row controls accessible-exclude" aria-label="player controls">
                             <button class="btn btn-success col-xs-4" onclick="get_req('resume')"><span class="glyphicon glyphicon-play"></span></button>
                             <button class="btn btn-success col-xs-4" onclick="get_req('skip')"><span class="glyphicon glyphicon-fast-forward"></span></button>
                             <button class="btn btn-success col-xs-4" onclick="get_req('pause')"><span class="glyphicon glyphicon-pause"></span></button>
