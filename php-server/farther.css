@@ -1,0 +1,26 @@
+.submit-form .row {
+    padding-bottom: 0.2em;
+    text-align: right;
+}
+.submit-form input {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#playing_now .alert {
+    text-align: center;
+}
+#client_status .alert {
+    text-align: center;
+}
+.vid-listed img {
+    margin-bottom: 1em;
+}
+.section-header h2 {
+    text-align: center;
+}
+
+.controls button {
+    font-size: 1.2em;
+    line-height: 2;
+}
