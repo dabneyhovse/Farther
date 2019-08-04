@@ -34,7 +34,7 @@ except:
     pass
 
 history = Queue()
-histlog = open('history.log', 'a')
+histlog = open('/srv/python/farther-client/server/history.log', 'a')
 
 playing = None
 if not queue.empty():
