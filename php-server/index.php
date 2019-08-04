@@ -253,10 +253,10 @@
                     <button class="btn btn-primary col-sm-offset-4 col-sm-2 col-xs-12" onclick="submit_song();" class="control">Submit</button>
 
                     <div class="col-sm-offset-2 col-sm-4 col-xs-12">
-                        <div class="row controls accessible-exclude" aria-label="player controls">
-                            <button class="btn btn-success col-xs-4" onclick="get_req('resume')"><span class="glyphicon glyphicon-play"></span></button>
-                            <button class="btn btn-success col-xs-4" onclick="get_req('skip')"><span class="glyphicon glyphicon-fast-forward"></span></button>
-                            <button class="btn btn-success col-xs-4" onclick="get_req('pause')"><span class="glyphicon glyphicon-pause"></span></button>
+                        <div class="row controls" aria-label="player controls">
+                            <button class="btn btn-success col-xs-4" onclick="get_req('resume')"><span class="accessible-exclude glyphicon glyphicon-play"></span></button>
+                            <button class="btn btn-success col-xs-4" onclick="get_req('skip')"><span class="accessible-exclude glyphicon glyphicon-fast-forward"></span></button>
+                            <button class="btn btn-success col-xs-4" onclick="get_req('pause')"><span class="accessible-exclude glyphicon glyphicon-pause"></span></button>
                         </div>
                     </div>
                 </div>
