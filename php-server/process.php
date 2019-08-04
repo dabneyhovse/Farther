@@ -50,7 +50,7 @@ function extract_vid_id($data) {
     $parsed = parse_url($data);
 
     if ($parsed['host'] === 'youtu.be') {
-    	return (substr($parsed['path'], 1));
+        return (substr($parsed['path'], 1));
     }
 
     // Parse the query string into an array.
@@ -71,12 +71,12 @@ function add_vid_to_queue($data) {
 
     $vid_id = extract_vid_id($data);
     $response = call_get_api(
-	    $PYTHON_SERVER . "add",
-	    array(
-		    "vid" => $vid_id,
-		    "user" => $usermap[$_POST['user']],
-		    "note" => $_POST['note']
-	    )
+        $PYTHON_SERVER . "add",
+        array(
+            "vid" => $vid_id,
+            "user" => $usermap[$_POST['user']],
+            "note" => $_POST['note']
+        )
     );
 
     return array_key_exists('message', $response) &&

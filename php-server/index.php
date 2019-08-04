@@ -107,8 +107,8 @@
         // TODO: better status messages?
 
         if (data.current) {
-	        document.getElementById('playing_now').innerHTML = format_song_elem(data.current);
-	    } else {
+            document.getElementById('playing_now').innerHTML = format_song_elem(data.current);
+        } else {
             document.getElementById('playing_now').innerHTML = `<div class="alert alert-info"><h3>No Song Playing.</h3></div>`;
         }
     }
@@ -237,9 +237,9 @@
                     <label class="col-sm-4 col-xs-12" for="user">Wiki username</label>
                     <input class="col-sm-8 col-xs-12" type="text" id="user" name="user" />
                 </div>
-		<div class="row"><div style="text-align: center;" class="col-xs-12">
-		Actual password system in progress, plz be nice
-		</div></div>
+                <div class="row"><div style="text-align: center;" class="col-xs-12">
+                Actual password system in progress, plz be nice
+                </div></div>
 
                 <div class="row">
                     <label class="col-sm-4 col-xs-12" for="url">YouTube URL</label>
