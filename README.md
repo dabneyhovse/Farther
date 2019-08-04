@@ -1,9 +1,9 @@
-# farther-client
+# Farther
 Dabney House music- and video-playing queue
 
 It's like [Nearer](https://github.com/ejaszewski/nearer-client), but worse
 
-Farther (like Nearer) has three pieces:
+Farther (like Nearer) has three pieces, all of which are included in this repository:
 
  - A client, which is a Python script designed to run on a Raspberry Pi
  - A PHP interface for users to submit songs and view the queue
