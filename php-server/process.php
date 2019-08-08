@@ -20,7 +20,7 @@ $rows = explode("\n", $userfile);
 $usermap = array();
 foreach($rows as $data) {
     //get row data
-    $row_data = explode('      ', $data);
+    $row_data = explode('	', $data);
     $usermap[$row_data[0]] = $row_data[1];
 }
 
