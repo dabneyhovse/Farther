@@ -83,7 +83,7 @@ function add_vid_to_queue($data) {
            $response['message'] === 'Success!';
 }
 
-function queue_control($control) {
+function queue_control($data) {
     // TODO uncomment during interhouse
     //$code = 401;
     //$message = 'no controls during interhorse';
@@ -96,9 +96,18 @@ function queue_control($control) {
         case 'pause':
         case 'resume':
             global $PYTHON_SERVER;
+            global $usermap;
 
-            call_get_api($PYTHON_SERVER . $control);
-            return true;
+            $response = call_get_api(
+                $PYTHON_SERVER . $control,
+                array(
+                    "user" => $usermap[$_POST['user']],
+                    "note" => $_POST['note']
+                )
+            );
+
+            return array_key_exists('message', $response) &&
+                   $response['message'] === 'Success!';
         default:
             $code = 400;
             $message = 'Unknown action $control.';
@@ -124,8 +133,18 @@ function vid_data($vid_id) {
     return $vid_data;
 }
 
-if (array_key_exists('action', $_GET)) { // Queue control action.
-    queue_control($_GET['action']);
+if (array_key_exists('action', $_POST)) { // Queue control action.
+    if (! array_key_exists($_POST['user'], $usermap)) {
+        $code = 401;
+        $message = 'User not found.';
+    } else {
+        if ( queue_control($_POST['action']) ) {
+            $message = "Action performed.";
+        } else {
+            $code = 500; // Server error.
+            $message = 'Failed to perform player action.';
+        }
+    }
 }
 
 if (array_key_exists('url', $_POST)) { // Add song to queue.
