@@ -87,6 +87,7 @@ class Player:
 
     def stop(self):
         Player.current_player = None
+        status = PlayerStatus.STOPPED
         if Player.status == PlayerStatus.PLAYING:
             self.omx.quit() # mark player as dead before we block on quitting it
         elif Player.status in (PlayerStatus.DOWNLOADING, PlayerStatus.LOADING_DATA):
