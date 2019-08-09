@@ -117,57 +117,80 @@
     }
 
     let lock = false;
-    function submit_song() {
-        if (!lock) {
+    function server_action(error, formData, successCallback) {
+        if (error) {
+            $('#js_error_div').text(error);
+            $('#js_error_div').css('display', '');
+            clearTimeout(); // prevent odd behavior of overlapping timeout windows
+            setTimeout(() => { $('#js_error_div').css('display', 'none') }, 5000);
+            lock = false;
+        } else if (!lock) {
             lock = true;
 
-            let url = $('#url').val();
-            let note = $('#note').val();
-            let user = $("#user").val();
-
-            let formData = new FormData();
-            formData.append('url', url);
-            formData.append('note', note);
-            formData.append('user', user);
-            // TODO: store in localStorage or something, we don't want a
-            // formal login system
-
-            var error = null;
-            if (user == "") {
-                error = "Error! Name is required.";
-            } else if (url == "") {
-                error = "Error! YouTube URL is required.";
-            }
-
-            if (error) {
-                $('#js_error_div').text(error);
-                $('#js_error_div').css('display', '');
-                clearTimeout(); // prevent odd behavior of overlapping timeout windows
-                setTimeout(() => { $('#js_error_div').css('display', 'none') }, 5000);
+            fetch('process.php', {
+                method: 'POST',
+                body: formData,
+            }).then((res) => {
                 lock = false;
-            } else {
-                fetch('process.php', {
-                    method: 'POST',
-                    body: formData,
-                }).then((res) => {
-                    lock = false;
-                    update();
-                    if (res.status === 200) {
-                        res = res.json();
-                        $('#url').val('');
-                        $('#note').val('');
-
-                        $('#success_div').css('display', '');
-                        setTimeout(() => { $('#success_div').css('display', 'none') }, 5000);
-                    } else {
-                        $('#error_code').text(res.status);
-                        $('#failure_div').css('display', '');
-                        setTimeout(() => { $('#failure_div').css('display', 'none') }, 5000);
-                        res.json().then((resp) => {$("#error_message").text(resp.message);});
-                    }
-                });
-            }
+                update();
+                if (res.status === 200) {
+                    successCallback();
+                } else {
+                    $('#error_code').text(res.status);
+                    $('#failure_div').css('display', '');
+                    setTimeout(() => { $('#failure_div').css('display', 'none') }, 5000);
+                    res.json().then((resp) => {$("#error_message").text(resp.message);});
+                }
+            });
         }
+    }
+
+    function submit_song() {
+        let url = $('#url').val();
+        let note = $('#note').val();
+        let user = $("#user").val();
+
+        let formData = new FormData();
+        formData.append('url', url);
+        formData.append('note', note);
+        formData.append('user', user);
+
+        var error = null;
+        if (user == "") {
+            error = "Error! Name is required to submit song.";
+        } else if (url == "") {
+            error = "Error! YouTube URL is required.";
+        }
+
+        server_action(error, formData, () => {
+            $('#url').val('');
+            $('#note').val('');
+
+            $('#success_div').css('display', '');
+            setTimeout(() => { $('#success_div').css('display', 'none') }, 5000);
+        });
+    }
+
+    function player_action(action) {
+        let note = $('#note').val();
+        let user = $("#user").val();
+
+        let formData = new FormData();
+        formData.append('action', action);
+        formData.append('note', note);
+        formData.append('user', user);
+
+        var error = null;
+        if (user == "") {
+            error = "Error! Name is required for player actions.";
+        }
+
+        server_action(error, formData, () => {
+            $('#note').val('');
+
+            $('#success_div').css('display', '');
+            setTimeout(() => { $('#success_div').css('display', 'none') }, 5000);
+        });
     }
 
     $(function() {
@@ -254,9 +277,9 @@
 
                     <div class="col-sm-offset-2 col-sm-4 col-xs-12">
                         <div class="row controls" aria-label="player controls">
-                            <button class="btn btn-success col-xs-4" onclick="get_req('resume')"><span class="accessible-exclude glyphicon glyphicon-play"></span></button>
-                            <button class="btn btn-success col-xs-4" onclick="get_req('skip')"><span class="accessible-exclude glyphicon glyphicon-fast-forward"></span></button>
-                            <button class="btn btn-success col-xs-4" onclick="get_req('pause')"><span class="accessible-exclude glyphicon glyphicon-pause"></span></button>
+                            <button class="btn btn-success col-xs-4" onclick="server_action('resume')"><span class="accessible-exclude glyphicon glyphicon-play"></span></button>
+                            <button class="btn btn-success col-xs-4" onclick="server_action('skip')"><span class="accessible-exclude glyphicon glyphicon-fast-forward"></span></button>
+                            <button class="btn btn-success col-xs-4" onclick="server_action('pause')"><span class="accessible-exclude glyphicon glyphicon-pause"></span></button>
                         </div>
                     </div>
                 </div>
