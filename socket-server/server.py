@@ -23,18 +23,20 @@ def local_only(f):
         return f(*args, **kwargs)
     return decorated
 
+OUT_FILE_ROOT = "/srv/python/Farther/socket-server/"
+
 # Play Queue State Variables
 queue = Queue()
 try:
-    qd = open('queuedump.txt', 'r')
+    qd = open(OUT_FILE_ROOT + 'queuedump.txt', 'r')
     for song in qd.readlines():
         queue.put(song.rstrip())
-    os.remove('queuedump.txt')
+    os.remove(OUT_FILE_ROOT + 'queuedump.txt')
 except:
     pass
 
 history = Queue()
-histlog = open('/srv/python/farther-client/server/history.log', 'a')
+histlog = open(OUT_FILE_ROOT + 'history.log', 'a')
 
 playing = None
 if not queue.empty():
@@ -53,7 +55,7 @@ caltech = re.compile('131.215.[0-9]{1,3}.[0-9]{1,3}')
 @app.before_request
 def limit_remote_addr():
     if caltech.fullmatch(request.remote_addr) == None and \
-       request.remote_addr != '127.0.0.1':
+        request.remote_addr != '127.0.0.1':
         abort(403)  # Forbidden
         print(request.remote_addr)
 
@@ -134,6 +136,7 @@ def addToQueue():
         return json.dumps({ "message": "Success!", "queue": list(queue.queue)})
 
 @app.route('/pause')
+@local_only
 def pauseQueue():
     global running
     print('Pause requested.')
@@ -154,6 +157,7 @@ def paused(timestamp):
     socketio.emit('status', getStatus())
 
 @app.route('/resume')
+@local_only
 def resumeQueue():
     global running
     print('Resume requested.')
@@ -165,6 +169,7 @@ def resumeQueue():
     return json.dumps({ "message": "Success!", "queue": list(queue.queue)})
 
 @app.route('/skip')
+@local_only
 def skip():
     print('Skip requested.')
 
