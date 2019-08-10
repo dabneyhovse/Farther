@@ -191,9 +191,7 @@ if (array_key_exists('status', $_GET)) {
 
     if ($data['current'] != null) {
         $current = vid_data($data['current']['vid']);
-        $current['note'] = $data['current']['note'];
-        $current['added_by'] = $data['current']['user'];
-        $current['added_on'] = $data['current']['time'];
+        // TODO update to send actions
 
         $data['current'] = $current;
         array_push($songs, $current);
