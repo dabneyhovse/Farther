@@ -191,7 +191,7 @@ if (array_key_exists('status', $_GET)) {
 
     if ($data['current'] != null) {
         $current = vid_data($data['current']['vid']);
-        // TODO update to send actions
+        $current['actions'] = $data['current']['actions'];
 
         $data['current'] = $current;
         array_push($songs, $current);
@@ -201,7 +201,7 @@ if (array_key_exists('status', $_GET)) {
 } else {
     $result = $code == 200 ? 'success' : 'failure';
     echo "{\"result\": \"$result\", \"message\": \"$message\"}";
-    http_response_code($code);
+    http_response_code($code); // TODO this does not work on some PHP versions
 }
 
 ?>

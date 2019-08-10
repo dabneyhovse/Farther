@@ -56,6 +56,20 @@
         });
         return videos;
     }
+
+    function format_action(action) {
+        var result = '<li class="list-group-item">';
+        result += `<b>${action.action}</b>`;
+        if (action.user) {
+            result += ` by ${action.user} `
+        }
+        result += ` on ${action.time}`
+        if (action.note.length > 0) {
+            result += `<blockquote class="blockquote">${action.note}</blockquote>`
+        }
+        result += '</li>';
+        return result;
+    }
     function format_song_elem(song) {
         if (song == null)
             return "";
@@ -67,8 +81,9 @@
                     <a href="${song.url}">${song.title}</a>
                 </h4>
                 <p>Uploaded by <a href="${song.author_url}">${song.author_name}</a></p>
-                <p>Added by ${song.added_by} on ${song.added_on}</p>
-                <p>${song.note}</p>
+                <ul class="list-group">
+                ${song.actions.map( (act) => format_action(act) ).reduce((a, b) => a + b) }
+                </ul>
             </div>
         </div>`
     }
@@ -84,13 +99,13 @@
         let songs = [];
         if (data.history && data.history.length > 0) {
             let song_data = await get_video_data(data.history.map(x => x != null ? x.vid : null));
-            data.history.map((song, i) => song == null ? null : Object.assign({ note: song.note, added_by: song.user, added_on: song.time }, song_data[i]))
+            data.history.map((song, i) => song == null ? null : Object.assign({ actions: song.actions }, song_data[i]))
                 .map((song) => { history_div_inner += format_song_elem(song); });
         }
 
         if (data.queue && data.queue.length > 0) {
             let song_data = await get_video_data(data.queue.map(x => x.vid));
-            data.queue.map((song, i) => song == null ? null : Object.assign({ note: song.note, added_by: song.user, added_on: song.time }, song_data[i]))
+            data.queue.map((song, i) => song == null ? null : Object.assign({ actions: song.actions }, song_data[i]))
                 .map((song) => { queue_div_inner += format_song_elem(song); })
             ;
         }
