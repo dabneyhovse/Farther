@@ -257,7 +257,13 @@
             </div>
             <?php endif; ?>
 
-
+            <div class="row">
+                <div id="bad_ip_div" class="alert alert-info col-xs-12">
+                    <b>New features!</b>
+                    You can now provide a note to accompany a play, pause, or skip action.
+                    These notes are displayed anonymously (subject to change, see the Farther chat for opinions).
+                </div>
+            </div>
 
             <div class="row">
                 <div id="success_div" class="alert alert-success col-xs-12" style="display: none">
@@ -277,7 +283,7 @@
                     <input class="col-sm-8 col-xs-12" type="text" id="user" name="user" />
                 </div>
                 <div class="row"><div style="text-align: center;" class="col-xs-12">
-                Actual password system in progress, plz be nice
+                Actual password system still in progress, plz be nice
                 </div></div>
 
                 <div class="row">
