@@ -83,7 +83,7 @@ function add_vid_to_queue($data) {
            $response['message'] === 'Success!';
 }
 
-function queue_control($data) {
+function queue_control($control) {
     // TODO uncomment during interhouse
     //$code = 401;
     //$message = 'no controls during interhorse';

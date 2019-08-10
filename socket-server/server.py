@@ -23,7 +23,7 @@ def local_only(f):
         return f(*args, **kwargs)
     return decorated
 
-OUT_FILE_ROOT = "/srv/python/Farther/socket-server/"
+OUT_FILE_ROOT = "/Users/Nicholas/Desktop/wtf/"
 
 # Play Queue State Variables
 queue = Queue()
@@ -146,10 +146,10 @@ def addToQueue():
 @local_only
 def pauseQueue():
     print('Pause requested.')
-    if current:
+    if playing:
         user = request.args.get('user', '')
         note = request.args.get('note', '')
-        current["actions"].append(getAction("Paused", user, note))
+        playing["actions"].append(getAction("Paused", user, note))
 
     global running
     running = False
@@ -172,10 +172,10 @@ def paused(timestamp):
 def resumeQueue():
     global running
     print('Resume requested.')
-    if current:
+    if playing:
         user = request.args.get('user', '')
         note = request.args.get('note', '')
-        current["actions"].append(getAction("Resumed", user, note))
+        playing["actions"].append(getAction("Resumed", user, note))
 
     if not running:
         running = True
@@ -188,10 +188,10 @@ def resumeQueue():
 @local_only
 def skip():
     print('Skip requested.')
-    if current:
+    if playing:
         user = request.args.get('user', '')
         note = request.args.get('note', '')
-        current["actions"].append(getAction("Skipped", user, note))
+        playing["actions"].append(getAction("Skipped", user, note))
 
     socketio.emit('skip')
     return json.dumps({ "message": "Success!", "queue": list(queue.queue)})

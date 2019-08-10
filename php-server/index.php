@@ -167,6 +167,7 @@
             $('#note').val('');
 
             $('#success_div').css('display', '');
+            $('#success_div').text('Success! Song added to queue.');
             setTimeout(() => { $('#success_div').css('display', 'none') }, 5000);
         });
     }
@@ -188,6 +189,7 @@
         server_action(error, formData, () => {
             $('#note').val('');
 
+            $('#success_div').text(`Performed '${action}' action successfully`);
             $('#success_div').css('display', '');
             setTimeout(() => { $('#success_div').css('display', 'none') }, 5000);
         });
@@ -197,7 +199,6 @@
         $("#user").val(localStorage.getItem("username"));
 
         $("#user").change(function () {
-            console.log("change");
             localStorage.setItem("username", $("#user").val());
         });
     });
@@ -245,7 +246,7 @@
 
             <div class="row">
                 <div id="success_div" class="alert alert-success col-xs-12" style="display: none">
-                    Success! Song added to queue.
+
                 </div>
                 <div id="failure_div" class="alert alert-danger col-xs-12" style="display: none">
                     Error! Song not added to queue. Error <a id="error_code"></a>: <span id="error_message"></span>
@@ -277,9 +278,9 @@
 
                     <div class="col-sm-offset-2 col-sm-4 col-xs-12">
                         <div class="row controls" aria-label="player controls">
-                            <button class="btn btn-success col-xs-4" onclick="server_action('resume')"><span class="accessible-exclude glyphicon glyphicon-play"></span></button>
-                            <button class="btn btn-success col-xs-4" onclick="server_action('skip')"><span class="accessible-exclude glyphicon glyphicon-fast-forward"></span></button>
-                            <button class="btn btn-success col-xs-4" onclick="server_action('pause')"><span class="accessible-exclude glyphicon glyphicon-pause"></span></button>
+                            <button class="btn btn-success col-xs-4" onclick="player_action('resume')"><span class="accessible-exclude glyphicon glyphicon-play"></span></button>
+                            <button class="btn btn-success col-xs-4" onclick="player_action('skip')"><span class="accessible-exclude glyphicon glyphicon-fast-forward"></span></button>
+                            <button class="btn btn-success col-xs-4" onclick="player_action('pause')"><span class="accessible-exclude glyphicon glyphicon-pause"></span></button>
                         </div>
                     </div>
                 </div>
