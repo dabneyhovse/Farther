@@ -112,6 +112,15 @@ def queueStatus():
     status.update({'client_connected': client_connected})
     return json.dumps(status)
 
+def getAction(action_name, user, note):
+    return {
+        'action': action_name,
+        # TODO what should be anonymous and what shouldn't?
+        'user': user if action_name == "Enqueued" else None,
+        'note': note,
+        'time': datetime.now().strftime('%a, %b %d %Y %H:%M:%S')
+    }
+
 @app.route('/add')
 @local_only
 def addToQueue():
@@ -125,9 +134,7 @@ def addToQueue():
     else:
         data = {
             'vid': vid,
-            'user': user,
-            'note': note,
-            'time': datetime.now().strftime('%a, %b %d %Y %H:%M:%S')
+            'actions': [getAction("Enqueued", user, note)]
         }
         print({'action': 'play', **data}, file=histlog)
         queue.put(data, True)
@@ -138,11 +145,15 @@ def addToQueue():
 @app.route('/pause')
 @local_only
 def pauseQueue():
-    global running
     print('Pause requested.')
-    running = False;
+    if current:
+        user = request.args.get('user', '')
+        note = request.args.get('note', '')
+        current["actions"].append(getAction("Paused", user, note))
 
-    socketio.emit('pause');
+    global running
+    running = False
+    socketio.emit('pause')
 
     return json.dumps({ "message": "Success!", "queue": list(queue.queue)})
 
@@ -161,6 +172,11 @@ def paused(timestamp):
 def resumeQueue():
     global running
     print('Resume requested.')
+    if current:
+        user = request.args.get('user', '')
+        note = request.args.get('note', '')
+        current["actions"].append(getAction("Resumed", user, note))
+
     if not running:
         running = True
         playNext()
@@ -172,12 +188,10 @@ def resumeQueue():
 @local_only
 def skip():
     print('Skip requested.')
-
-    user = request.args.get('user', '')
-    if user == '':
-        print({'action': 'skip', 'vid': playing['vid']}, file=histlog)
-    else:
-        print({'action': 'skip', 'user': user, 'vid': playing['vid']}, file=histlog)
+    if current:
+        user = request.args.get('user', '')
+        note = request.args.get('note', '')
+        current["actions"].append(getAction("Skipped", user, note))
 
     socketio.emit('skip')
     return json.dumps({ "message": "Success!", "queue": list(queue.queue)})
