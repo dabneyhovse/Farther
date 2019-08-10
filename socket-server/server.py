@@ -23,7 +23,7 @@ def local_only(f):
         return f(*args, **kwargs)
     return decorated
 
-OUT_FILE_ROOT = "/Users/Nicholas/Desktop/wtf/"
+OUT_FILE_ROOT = "/srv/python/Farther/socket-server/"
 
 # Play Queue State Variables
 queue = Queue()
