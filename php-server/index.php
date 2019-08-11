@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
+    <!-- moment.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
+
     <!-- Dabney things -->
     <link rel="stylesheet" href="/static/service_style.css">
     <script src="/static/accessibility.js"></script>
@@ -41,7 +44,7 @@
 
         let id_list = ids.join(',');
 
-        let res = await fetch(`https://content.googleapis.com/youtube/v3/videos?id=${id_list}&part=snippet&key=${API_KEY}`);
+        let res = await fetch(`https://content.googleapis.com/youtube/v3/videos?id=${id_list}&part=snippet,contentDetails&key=${API_KEY}`);
         let json = await res.json()
 
         let videos = json.items.map(
@@ -51,12 +54,30 @@
                 author_url: `https://youtube.com/channel/${item.snippet.channelId}`,
                 title: item.snippet.title,
                 thumbnail: item.snippet.thumbnails.medium.url,
-                url: `https://youtu.be/${item.id}`
+                url: `https://youtu.be/${item.id}`,
+                duration: moment.duration(item.contentDetails.duration)
             }
         });
         return videos;
     }
 
+    // TODO moment.js doesn't seem to have a function that does this
+    function format_duration(duration) {
+        var ret = "";
+        if (duration.asHours() > 1) {
+            var hoursToPrint = Math.floor( duration.asHours() );
+            if (hoursToPrint < 10)
+                ret += "0";
+            ret += `${hoursToPrint}:`;
+        } // omit hours if duration is < 1 hour
+        if (duration.minutes() < 10)
+            ret += "0";
+        ret += `${duration.minutes()}:`;
+        if (duration.seconds() < 10)
+            ret += "0";
+        ret += `${duration.seconds()}`;
+        return ret;
+    }
     function format_action(action) {
         var result = '<li class="list-group-item">';
         result += `<b>${action.action}</b>`;
@@ -80,7 +101,7 @@
                 <h4>
                     <a href="${song.url}">${song.title}</a>
                 </h4>
-                <p>Uploaded by <a href="${song.author_url}">${song.author_name}</a></p>
+                <p>${format_duration(song.duration)}, Uploaded by <a href="${song.author_url}">${song.author_name}</a></p>
                 <ul class="list-group">
                 ${song.actions.map( (act) => format_action(act) ).reduce((a, b) => a + b) }
                 </ul>
@@ -122,7 +143,11 @@
         // TODO: better status messages?
 
         if (data.current) {
-            document.getElementById('playing_now').innerHTML = format_song_elem(data.current);
+            let currentData = await get_video_data([data.current.vid]);
+            let displayCurrent =
+                Object.assign({actions: data.current.actions}, currentData[0]);
+
+            document.getElementById('playing_now').innerHTML = format_song_elem(displayCurrent);
         } else {
             document.getElementById('playing_now').innerHTML = `<div class="alert alert-info"><h3>No Song Playing.</h3></div>`;
         }

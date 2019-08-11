@@ -115,24 +115,6 @@ function queue_control($control) {
     }
 }
 
-function vid_data($vid_id) {
-    $url = 'http://www.youtube.com/watch?v=' . $vid_id;
-    $curr_data = get_vid_data($vid_id);
-    $title = htmlentities($curr_data->title, null, 'UTF-8');
-    $author_name = htmlentities($curr_data->author_name, null, 'UTF-8');
-    $author_url = htmlentities($curr_data->author_url, null, 'UTF-8');
-    $thumbnail = htmlentities($curr_data->thumbnail_url, null, 'UTF-8');
-
-    $vid_data = array(
-        'url' => $url,
-        'title' => $title,
-        'author_name' => $author_name,
-        'author_url' => $author_url,
-        'thumbnail' => $thumbnail
-    );
-    return $vid_data;
-}
-
 if (array_key_exists('action', $_POST)) { // Queue control action.
     if (! array_key_exists($_POST['user'], $usermap)) {
         $code = 401;
@@ -181,21 +163,7 @@ if (array_key_exists('url', $_POST)) { // Add song to queue.
 }
 
 if (array_key_exists('status', $_GET)) {
-    $history = array();
-    $queue = array();
-    $songs = array();
-
     $data = call_get_api($PYTHON_SERVER . 'status');
-    //unset($data['queue']);
-    //unset($data['status']);
-
-    if ($data['current'] != null) {
-        $current = vid_data($data['current']['vid']);
-        $current['actions'] = $data['current']['actions'];
-
-        $data['current'] = $current;
-        array_push($songs, $current);
-    }
 
     echo json_encode($data);
 } else {
