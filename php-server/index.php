@@ -124,12 +124,19 @@
                 .map((song) => { history_div_inner += format_song_elem(song); });
         }
 
+        var queueDuration = moment.duration(0);
         if (data.queue && data.queue.length > 0) {
             let song_data = await get_video_data(data.queue.map(x => x.vid));
-            data.queue.map((song, i) => song == null ? null : Object.assign({ actions: song.actions }, song_data[i]))
-                .map((song) => { queue_div_inner += format_song_elem(song); })
+            data.queue
+                .map((song, i) => song == null ? null :
+                    Object.assign({ actions: song.actions }, song_data[i]))
+                .map((song) => {
+                    queue_div_inner += format_song_elem(song);
+                    queueDuration = queueDuration.add(song.duration);
+                })
             ;
         }
+        $("#queueDuration").html( format_duration(queueDuration) );
 
         document.getElementById('queue_list').innerHTML = queue_div_inner;
         document.getElementById('history_list').innerHTML = history_div_inner;
@@ -342,7 +349,7 @@
             </div>
 
             <div class="row section-header">
-                <h2>Queue</h2>
+                <h2>Queue (<span id="queueDuration">00:00</span>)</h2>
             </div>
             <div id="queue_list" class="row">
 
