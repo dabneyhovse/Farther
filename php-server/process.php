@@ -1,28 +1,11 @@
 <?php
 
-require_once("check_ip.php");
-
-if (! valid_ip($_SERVER['REMOTE_ADDR'])) {
-    echo "{\"message\": \"You must be on the Caltech network to use Farther.\"}";
-    http_response_code(403);
-    exit();
-}
-
-
 $PYTHON_SERVER = "http://localhost:27036/";
 
 $code = 200;
 $message = 'Success.';
 header('Content-Type: application/json');
 
-$userfile = file_get_contents("allowed_names.txt");
-$rows = explode("\n", $userfile);
-$usermap = array();
-foreach($rows as $data) {
-    //get row data
-    $row_data = explode('	', $data);
-    $usermap[$row_data[0]] = $row_data[1];
-}
 
 // Method: POST, PUT, GET etc
 // Data: array("param" => "value") ==> index.php?param=value
@@ -67,14 +50,13 @@ function get_vid_data($v) {
 
 function add_vid_to_queue($data) {
     global $PYTHON_SERVER;
-    global $usermap;
 
     $vid_id = extract_vid_id($data);
     $response = call_get_api(
         $PYTHON_SERVER . "add",
         array(
             "vid" => $vid_id,
-            "user" => $usermap[$_POST['user']],
+            "user" => $_SERVER['PHP_AUTH_USER'],
             "note" => $_POST['note']
         )
     );
@@ -96,12 +78,11 @@ function queue_control($control) {
         case 'pause':
         case 'resume':
             global $PYTHON_SERVER;
-            global $usermap;
 
             $response = call_get_api(
                 $PYTHON_SERVER . $control,
                 array(
-                    "user" => $usermap[$_POST['user']],
+                    "user" => $_SERVER['PHP_AUTH_USER'],
                     "note" => $_POST['note']
                 )
             );
@@ -116,16 +97,11 @@ function queue_control($control) {
 }
 
 if (array_key_exists('action', $_POST)) { // Queue control action.
-    if (! array_key_exists($_POST['user'], $usermap)) {
-        $code = 401;
-        $message = 'User not found.';
+    if ( queue_control($_POST['action']) ) {
+        $message = "Action performed.";
     } else {
-        if ( queue_control($_POST['action']) ) {
-            $message = "Action performed.";
-        } else {
-            $code = 500; // Server error.
-            $message = 'Failed to perform player action.';
-        }
+        $code = 500; // Server error.
+        $message = 'Failed to perform player action.';
     }
 }
 
@@ -148,9 +124,6 @@ if (array_key_exists('url', $_POST)) { // Add song to queue.
     if ($ride) {
         $code = 403; // You can't just play the ride!
         $message = 'Ride detected. Nice try, punk.';
-    } else if (! array_key_exists($_POST['user'], $usermap)) {
-        $code = 401;
-        $message = 'User not found.';
     } else {
         // Get the POST data.
         if (add_vid_to_queue($_POST['url'])) {

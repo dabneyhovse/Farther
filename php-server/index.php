@@ -175,6 +175,7 @@
             lock = true;
 
             fetch('process.php', {
+                credentials: 'include',
                 method: 'POST',
                 body: formData,
             }).then((res) => {
@@ -195,17 +196,13 @@
     function submit_song() {
         let url = $('#url').val();
         let note = $('#note').val();
-        let user = $("#user").val();
 
         let formData = new FormData();
         formData.append('url', url);
         formData.append('note', note);
-        formData.append('user', user);
 
         var error = null;
-        if (user == "") {
-            error = "Error! Name is required to submit song.";
-        } else if (url == "") {
+        if (url == "") {
             error = "Error! YouTube URL is required.";
         }
 
@@ -221,17 +218,12 @@
 
     function player_action(action) {
         let note = $('#note').val();
-        let user = $("#user").val();
 
         let formData = new FormData();
         formData.append('action', action);
         formData.append('note', note);
-        formData.append('user', user);
 
         var error = null;
-        if (user == "") {
-            error = "Error! Name is required for player actions.";
-        }
 
         server_action(error, formData, () => {
             $('#note').val('');
@@ -242,29 +234,9 @@
         });
     }
 
-    $(function() {
-        $("#user").val(localStorage.getItem("username"));
-
-        $("#user").change(function () {
-            localStorage.setItem("username", $("#user").val());
-        });
-    });
-
     </script>
     <div class="row">
         <div id="page-content" class="col-xs-12">
-            <?php
-            require_once("check_ip.php");
-            if (! valid_ip($_SERVER['REMOTE_ADDR'])) :
-            ?>
-            <div class="row">
-                <div id="bad_ip_div" class="alert alert-warning col-xs-12">
-                    <span class="glyphicon glyphicon-map-marker"></span>
-                    <b>Warning!</b> You must connect be on the Caltech network to use Farther.
-                </div>
-            </div>
-            <?php endif; ?>
-
             <?php
             $current = new DateTime();
             $current->setTimezone(new DateTimeZone('America/Los_Angeles'));
@@ -310,14 +282,6 @@
             </div>
 
             <span class="submit-form" aria-label="song submission">
-                <div class="row">
-                    <label class="col-sm-4 col-xs-12" for="user">Wiki username</label>
-                    <input class="col-sm-8 col-xs-12" type="text" id="user" name="user" />
-                </div>
-                <div class="row"><div style="text-align: center;" class="col-xs-12">
-                Actual password system still in progress, plz be nice
-                </div></div>
-
                 <div class="row">
                     <label class="col-sm-4 col-xs-12" for="url">YouTube URL</label>
                     <input class="col-sm-8 col-xs-12" type="text" id="url" name="url" />
