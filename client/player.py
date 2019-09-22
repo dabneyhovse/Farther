@@ -61,6 +61,8 @@ class Player:
         t.start()
 
     def __play(self):
+        logging.info("Starting OMXPlayer for {} at {}".format(self.vid_data.id, self.start_time))
+
         args = ["-o", "local"]
         if self.start_time != 0:
             args += ["--pos", get_timestamp(self.start_time)]
@@ -71,6 +73,7 @@ class Player:
             Player.current_player.stop()
         Player.current_player = self
 
+        Player.status = PlayerStatus.PLAYING
         self.omx = OMXPlayer(self.vid_data.url, args=args)
         self.omx.exitEvent += lambda p, code: self.stop()
 
@@ -82,16 +85,16 @@ class Player:
         if Player.current_volume == 0:
             self.omx.mute()
 
-        logging.info("Started OMXPlayer for {} at {}".format(self.vid_data.id, self.start_time))
-        Player.status = PlayerStatus.PLAYING
+        logging.info("OMXPlayer for {} has started".format(self.vid_data.id))
 
     def stop(self):
-        Player.current_player = None
-        Player.status = PlayerStatus.STOPPED
         if Player.status == PlayerStatus.PLAYING:
             self.omx.quit() # mark player as dead before we block on quitting it
         elif Player.status in (PlayerStatus.DOWNLOADING, PlayerStatus.LOADING_DATA):
             self.vid_data.remove_ready_callback()
+
+        Player.current_player = None
+        Player.status = PlayerStatus.STOPPED
 
     @classmethod
     def stop_current(self):
